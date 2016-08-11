@@ -3,7 +3,7 @@
 #include <math.h>
 #include "GraphNode.h"
 #include "BulkLink.h"
-#include "BulkPackets.h"
+#include "bulkPacket.h"
 #include <queue>
 #include <vector>
 #include <algorithm>

@@ -1,45 +1,39 @@
 #ifndef _GRAPHNODE_H_
 #define _GRAPHNODE_H_
+#include <algorithm>
 #include <ext/slist>
 #include "GraphEdge.h"
 using namespace __gnu_cxx;
+using namespace std;
 class GraphNode
 {
 	private:
-		int id;		//id of the end node of the edge
-		int numHeadQueue; //number of the head queues
-		int numTailQueue; //number of the tail queues
-		slist<GraphEdge>* headEdge;  //Node点为sink点
-		slist<GraphEdge>* tailEdge;  //Node点为source点
+		int _id;		//id of the end node of the edge
+		int _numEdge;   
+		slist<GraphEdge>* _edge;  //node点为sink点
 	public:
 		//constructors
-		GraphNode():id(-1), numHeadQueue(0), numTailQueue(0) 
+		GraphNode():_id(-1), _numEdge(0)
 		{
-			this->headEdge = new slist<GraphEdge>(0);
-			this->tailEdge = new slist<GraphEdge>(0);
+			_edge = new slist<GraphEdge>(0);
 		}
-		explicit GraphNode(const GraphNode& Node);
-		GraphNode(GraphNode& Node);
-		GraphNode(int _id);
+		explicit GraphNode(const GraphNode& node);
+		GraphNode(GraphNode& node);
+		GraphNode(int id);
 		bool operator == (const GraphNode& node);
-		bool addBulkEdge(GraphEdge* edge);
-		bool removeBulkEdge(GraphEdge* edge);
-		int getNumHeadQueue() const;
-		int getNumTailQueue() const;
+		bool addEdge(GraphEdge* edge);
+		bool removeEdge(GraphEdge* edge);
+		int getNumEdge() const;
 		int getNodeId() const;
-		GraphEdge* getBulkEdge(GraphEdge* edge) const;
-		slist<GraphEdge>* getHeadEdge() const;
-		slist<GraphEdge>* getTailEdge() const;
+		GraphEdge* getEdge(GraphEdge* edge) const;
+		slist<GraphEdge>* getEdge() const;
 		GraphNode& setId(int id);
 		GraphNode& operator = (const GraphNode &node);
-		int Print();
 		//destructor
 		virtual ~GraphNode()
 		{
-			this->headEdge->~slist();
-			this->tailEdge->~slist();
-			this->headEdge = NULL;
-			this->tailEdge = NULL;
+			_edge->~slist();
+			_edge = NULL;
 		}
 };
 #endif

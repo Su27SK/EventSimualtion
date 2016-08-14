@@ -1,15 +1,14 @@
 #ifndef _GRAPH_H_
 #define _GRAPH_H_
-#include <ext/slist>
 #include <string.h>
 #include <fstream>
 #include <sstream>
 #include <iostream>
 #include <cfloat>
+#include "File.h"
 #include "GraphNode.h"
 #define LINEMAX 1500
 using namespace std;
-using namespace __gnu_cxx;
 class Graph  
 {
 	private:

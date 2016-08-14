@@ -64,7 +64,7 @@ double Graph::capacity(int v1, int v2) const
 	if (v1 >= 1 && v2 >= 1 && v1 <= n && v2 <= n)
 	{
 		GraphEdge edge(v1, v2);
-		GraphEdge* nowEdge = aList[v1].getBulkEdge(&edge);
+		GraphEdge* nowEdge = aList[v1].getEdge(&edge);
 		if (nowEdge != NULL) {
 			return nowEdge->getCapacity();
 		}
@@ -87,7 +87,7 @@ double Graph::weight(int v1, int v2) const
 	if (v1 >= 1 && v2 >= 1 && v1 <= n && v2 <= n)
 	{
 		GraphEdge edge(v1, v2);
-		GraphEdge* nowEdge = aList[v1].getBulkEdge(&edge);
+		GraphEdge* nowEdge = aList[v1].getEdge(&edge);
 		if (nowEdge != NULL) {
 			return nowEdge->getWeight();
 		}
@@ -119,8 +119,8 @@ void Graph::putEdge(int v1, int v2, double weight, double capacity)
 		aList[v2] = node2;
 	}
 	GraphEdge edge(v1, v2, weight, capacity);
-	aList[v1].addBulkEdge(&edge);
-	aList[v2].addBulkEdge(&edge);
+	aList[v1].addEdge(&edge);
+	aList[v2].addEdge(&edge);
 	this->e++;
 }
 
@@ -138,8 +138,8 @@ void Graph::removeEdge(int v1, int v2)
 			return;
 		} else {
 			GraphEdge edge(v1, v2);
-			if (aList[v1].removeBulkEdge(&edge) || 
-				aList[v2].removeBulkEdge(&edge)) {
+			if (aList[v1].removeEdge(&edge) || 
+				aList[v2].removeEdge(&edge)) {
 				this->e--;
 			}
 		}
@@ -193,9 +193,9 @@ bool Graph::connected(int v1, int v2)
 void Graph::_dfsVisit(int uSource, int* visited, int vSink)
 {
 	visited[uSource] = 1;
-	slist<GraphEdge>* headEdge = aList[uSource].getHeadEdge();
-	slist<GraphEdge>::iterator iter = headEdge->begin();
-	slist<GraphEdge>::iterator iterEnd = headEdge->end();
+	slist<GraphEdge>* edge = aList[uSource].getEdge();
+	slist<GraphEdge>::iterator iter = edge->begin();
+	slist<GraphEdge>::iterator iterEnd = edge->end();
 	for (; iter != iterEnd; iter++) {
 		if (visited[vSink]) {
 			break;
@@ -220,7 +220,7 @@ void Graph::_dfsVisit(int uSource, int* visited, int vSink)
 Graph* Graph::importGraph(string cfilename)
 {
 	int i, nPos = 1;
-	BulkFile* inFile = new BulkFile("Bulk_Config_File");
+	File* inFile = new File("Bulk_Config_File");
 	//inFile->addFile(cfilename, "Bulk_Config_File");
 	char** msgBuf = (char**)malloc(LINEMAX * sizeof(char*));
 	for (i = 0; i < LINEMAX; i++) {
@@ -312,5 +312,4 @@ GraphNode* Graph::getList()
 {
 	return aList;
 }
-
 

@@ -13,7 +13,7 @@ class bulkLink:public GraphEdge
 		bulkBuffer tailbuf_;
 		bulkLink():GraphEdge() {_tailId = _headId = -1;}
 		bulkLink(int from, int to):GraphEdge(from, to){_tailId = _headId = -1;}
-		bulkLink(int from, int to, double weight, double capacity):GraphEdge(from, to, weight, capacity){_tailId = _headId = -1;}
+		bulkLink(int from, int to, double weight, double capacity):GraphEdge(from, to, weight, capacity) {_tailId = _headId = -1;}
 		bulkLink(GraphEdge& edge):GraphEdge(edge){_tailId = _headId = -1;}
 		double getVaryCapacity();
 		bulkLink& setTailId(int id);

@@ -1,77 +1,65 @@
 #include "GraphNode.h"
-GraphNode::GraphNode(int _id):id(_id), numHeadQueue(0), numTailQueue(0)
+GraphNode::GraphNode(int id): _id(id), _numEdge(0)
 {
-	if (this->id < 1) {
-		this->id = -1;
+	if (this->_id < 1) {
+		this->_id = -1;
 	}
-	this->headEdge = new slist<GraphEdge>(0);
-	this->tailEdge = new slist<GraphEdge>(0);
+	this->_edge = new slist<GraphEdge>(0);
 }
 
 /**
  * @brief GraphNode 
  * 显式深拷贝构造函数
- * @param {GraphNode} Node
+ * @param {GraphNode} node
  */
-GraphNode::GraphNode(const GraphNode& Node)
+GraphNode::GraphNode(const GraphNode& node)
 {
-	this->id = Node.id;
-	this->numHeadQueue = Node.numHeadQueue;
-	this->numTailQueue = Node.numTailQueue;
+	this->_id = node._id;
+	this->_numEdge = node._numEdge;
 	slist<GraphEdge>::iterator iterS;
 	slist<GraphEdge>::iterator iterE;
-	iterS = Node.headEdge->begin();
-	iterE = Node.headEdge->end();
-	this->headEdge = new slist<GraphEdge>(iterS, iterE);
-	iterS = Node.tailEdge->begin();
-	iterE = Node.tailEdge->end();
-	this->tailEdge = new slist<GraphEdge>(iterS, iterE);
+	iterS = node._edge->begin();
+	iterE = node._edge->end();
+	this->_edge = new slist<GraphEdge>(iterS, iterE);
 }
 
 /**
  * @brief GraphNode 
  * 深拷贝构造函数
- * @param {GraphNode} Node
+ * @param {GraphNode} node
  */
-GraphNode::GraphNode(GraphNode& Node)
+GraphNode::GraphNode(GraphNode& node)
 {
-	this->id = Node.id;
-	this->numHeadQueue = Node.numHeadQueue;
-	this->numTailQueue = Node.numTailQueue;
+	this->_id = node._id;
+	this->_numEdge = node._numEdge;
 	slist<GraphEdge>::iterator iterS;
 	slist<GraphEdge>::iterator iterE;
-	iterS = Node.headEdge->begin();
-	iterE = Node.headEdge->end();
-	this->headEdge = new slist<GraphEdge>(iterS, iterE);
-	iterS = Node.tailEdge->begin();
-	iterE = Node.tailEdge->end();
-	this->tailEdge = new slist<GraphEdge>(iterS, iterE);
+	iterS = node._edge->begin();
+	iterE = node._edge->end();
+	this->_edge = new slist<GraphEdge>(iterS, iterE);
 }
 
-bool GraphNode::operator == (const GraphNode& node)
+/**
+ * @brief operator==
+ * 重载操作符
+ * @param {GraphNode} node
+ *
+ * @return {boolean}
+ */
+bool GraphNode::operator==(const GraphNode& node)
 {
-	return id == node.id;
+	return _id == node._id;
 }
 
 
 /**
- * @brief getNumHeadQueue 
- * 获得该节点中的head queues的数量
+ * @brief getNumEdge 
+ * 获得该节点中的edge数量
  * @return {integer}
  */
-int GraphNode::getNumHeadQueue() const
+int GraphNode::getNumEdge() const
 {
-	return this->numHeadQueue;
-}
-
-/**
- * @brief getNumTailQueue 
- * 获得该节点中的tail queues的数量
- * @return {integer}
- */
-int GraphNode::getNumTailQueue() const
-{
-	return this->numTailQueue;
+	return _numEdge;
 }
 
 /**
@@ -81,45 +69,32 @@ int GraphNode::getNumTailQueue() const
  */
 int GraphNode::getNodeId() const
 {
-	return this->id;
+	return _id;
 }
 
+
 /**
- * @brief getHeadEdge 
+ * @brief getEdge 
  *
  * @return slist<GraphEdge>*
  */
-slist<GraphEdge>* GraphNode::getHeadEdge() const
+slist<GraphEdge>* GraphNode::getEdge() const
 {
-	return this->headEdge;
+	return _edge;
 }
 
 /**
- * @brief getTailEdge 
- *
- * @return slist<GraphEdge>*
- */
-slist<GraphEdge>* GraphNode::getTailEdge() const
-{
-	return this->tailEdge;
-}
-
-/**
- * @brief addBulkEdge 
+ * @brief addEdge 
  * 节点中增加与节点相连的边
  * @param {GraphEdge} edge
  *
  * @return {boolean}
  */
-bool GraphNode::addBulkEdge(GraphEdge* edge)
+bool GraphNode::addEdge(GraphEdge* edge)
 {
-	if (this->id == edge->getGraphEdgeSource()) {
-		this->tailEdge->push_front(*edge);
-		this->numHeadQueue++;
-		return true;
-	} else if (this->id == edge->getGraphEdgeSink()) {
-		this->headEdge->push_front(*edge);
-		this->numTailQueue++;
+	if (_id == edge->getGraphEdgeSource() || _id == edge->getGraphEdgeSink()) {
+		_edge->push_front(*edge);
+		_numEdge++;
 		return true;
 	} else {
 		return false;
@@ -127,34 +102,18 @@ bool GraphNode::addBulkEdge(GraphEdge* edge)
 }
 
 /**
- * @brief removeBulkEdge 
+ * @brief removeEdge 
  * 节点中删除与节点相连的边
  * @param {GraphEdge} edge
  *
  * @return {boolean}
  */
-bool GraphNode::removeBulkEdge(GraphEdge* edge)
+bool GraphNode::removeEdge(GraphEdge* edge)
 {
-	slist<GraphEdge>::iterator iter;
-	slist<GraphEdge>::iterator iterEnd;
-	if (this->id == edge->getGraphEdgeSource()) {
-		iter = this->headEdge->begin();
-		iterEnd = this->headEdge->end();
-		for (; iter != iterEnd; iter++) {
-			if (*iter == *edge) {
-				this->headEdge->erase(iter);
-				return true;
-			}
-		}
-	} else if (this->id == edge->getGraphEdgeSink()) {
-		iter = this->tailEdge->begin();
-		iterEnd = this->tailEdge->end();
-		for (; iter != iterEnd; iter++) {
-			if (*iter == *edge) {
-				this->headEdge->erase(iter);
-				return true;
-			}
-		}
+	GraphEdge* pEdge = getEdge(edge);
+	if (pEdge != NULL) {
+		_edge->erase(remove(_edge->begin(), _edge->end(), *pEdge), _edge->end());
+		return true;
 	}
 	return false;
 }
@@ -170,60 +129,33 @@ GraphNode& GraphNode::operator=(const GraphNode &node)
 {
 	if (this != &node) {
 		GraphNode nodeTemp(node);
-		this->id = nodeTemp.id;
-		this->numHeadQueue = nodeTemp.numHeadQueue;
-		this->numTailQueue = nodeTemp.numTailQueue;
-		slist<GraphEdge>* pHTemp = nodeTemp.headEdge;
-		nodeTemp.headEdge = this->headEdge;
-		this->headEdge = pHTemp;
-
-		slist<GraphEdge>* pTTemp = nodeTemp.tailEdge;
-		nodeTemp.tailEdge = this->tailEdge;
-		this->tailEdge = pTTemp;
+		this->_id = nodeTemp._id;
+		this->_numEdge = nodeTemp._numEdge;
+		slist<GraphEdge>* pTemp = nodeTemp._edge;
+		nodeTemp._edge = this->_edge;
+		this->_edge = pTemp;
 	}
 	return *this;
 }
 
 /**
- * @brief getBulkEdge 
+ * @brief getEdge 
  * 通过edge 返回向量边,包含具体信息，比如weight, capacity信息
  * (*iter == *edge) 主要比较(from, to)的数值
  * @param {GraphEdge} edge
  *
  * @return {GraphEdge}
  */
-GraphEdge* GraphNode::getBulkEdge(GraphEdge* edge) const
+GraphEdge* GraphNode::getEdge(GraphEdge* edge) const
 {
-	slist<GraphEdge>::iterator iter;
-	slist<GraphEdge>::iterator iterEnd;
-	if (this->id == edge->getGraphEdgeSource()) {
-		iter = this->headEdge->begin();
-		iterEnd = this->headEdge->end();
-		for (; iter != iterEnd; iter++) {
-			if (*iter == *edge) {
-				return &(*iter);
-			}
+	slist<GraphEdge>::iterator iter = _edge->begin();
+	slist<GraphEdge>::iterator iterEnd = _edge->end();
+	for (; iter != iterEnd; iter++) {
+		if (*iter == *edge) {
+			return &(*iter);
 		}
-	} else if (this->id == edge->getGraphEdgeSink()) {
-		iter = this->tailEdge->begin();
-		iterEnd = this->tailEdge->end();
-		for (; iter != iterEnd; iter++) {
-			if (*iter == *edge) {
-				return &(*iter);
-			}
-		}
-	} 
-	if (iter == iterEnd) {
-		return NULL; 
 	}
 	return NULL;
-}
-
-int GraphNode::Print()
-{
-	slist<GraphEdge>::iterator iter;
-	iter = this->headEdge->begin();
-	return iter->getGraphEdgeSource();
 }
 
 /**
@@ -235,7 +167,6 @@ int GraphNode::Print()
  */
 GraphNode& GraphNode::setId(int id)
 {
-	this->id = id;
+	_id = id;
 	return *this;
 }
-

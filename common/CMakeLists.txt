@@ -7,23 +7,10 @@ else()
   cmake_minimum_required(VERSION 2.6.3)
 endif()
 
-# 找到头文件
-include_directories(../common)
-include_directories(../topology)
-include_directories(../lib)
-
 # 查找当前目录下面的所有源文件
 # 并将名称保存到 DIR_SRCS 变量
 aux_source_directory(. DIR_LIB_SRCS)
 
 # 生成链接库
-add_library(apps ${DIR_LIB_SRCS})
+add_library(common ${DIR_LIB_SRCS})
 
-set (CMAKE_CXX_FLAGS "-g")
-set (CMAKE_CXX_FLAGS "-Wall")
-set (CMAKE_CXX_FLAGS "-I/usr/local/include")
-set (CMAKE_CXX_FLAGS "-L/usr/local/lib")
-
-if (APPLE) 
-	set (CMAKE_CXX_FLAGS "-stdlib=libstdc++") 
-endif()

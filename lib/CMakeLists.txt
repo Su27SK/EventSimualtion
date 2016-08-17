@@ -7,27 +7,17 @@ else()
   cmake_minimum_required(VERSION 2.6.3)
 endif()
 
-# 项目信息
-project (Network)
-
 # 查找当前目录下面的所有源文件
 # 并将名称保存到 DIR_SRCS 变量
-aux_source_directory(. DIR_SRCS)
+aux_source_directory(. DIR_LIB_SRCS)
 
-# 添加子目录
-add_subdirectory(topology)
+# 生成链接库
+add_library(lib ${DIR_LIB_SRCS})
 
-add_subdirectory(common)
-
-add_subdirectory(apps)
-
-# 指定生成目标
-add_executable(BulkTest BulkTest.c)
-
-# 添加链路库
-target_link_libraries(BulkTest apps lib common topology)
-
-set (CMAKE_CXX_COMPILER "clang++") # 显示指定使用的 C++编译器
+set (CMAKE_CXX_FLAGS  "-g")
+set (CMAKE_CXX_FLAGS  "-Wall")
+set (CMAKE_CXX_FLAGS  "-I /usr/local/include")
+set (CMAKE_CXX_FLAGS  "-L /usr/local/lib")
 
 if (APPLE) 
 	set (CMAKE_CXX_FLAGS "-stdlib=libstdc++") 

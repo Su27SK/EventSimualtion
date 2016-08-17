@@ -3,12 +3,10 @@
 #include <math.h>
 #include "GraphNode.h"
 #include "bulkLink.h"
-#include "bulkPacket.h"
 #include <queue>
 #include <vector>
 #include <algorithm>
 #define ROUND(x) ((x) > 0.0 ? floor((x) + 0.5) : ceil((x) - 0.5));
-class bulkLink;
 class bulkNode:public GraphNode
 {
 	private:
@@ -33,6 +31,8 @@ class bulkNode:public GraphNode
 		slist<bulkLink*>* getInputLink();
 		void addOutputLink(bulkLink* link);
 		void addInputLink(bulkLink* link);
+		int getOutputNum();
+		int getInputNum();
 		bulkNode& setTerminal();
 		bulkNode& setOriginal();
 };

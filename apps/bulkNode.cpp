@@ -94,6 +94,26 @@ slist<bulkLink*>* bulkNode::getInputLink()
 }
 
 /**
+ * @brief getOutputLink 
+ *
+ * @return {interge}
+ */
+int bulkNode::getOutputLink()
+{
+	return output_->size();
+}
+
+/**
+ * @brief getInputLink 
+ *
+ * @return {interge}
+ */
+int bulkNode::getInputLink()
+{
+	return input_->size();
+}
+
+/**
  * @brief addOutputLink 
  * 增加下一跳链路
  * @param {bulkLink*} link

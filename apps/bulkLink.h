@@ -3,6 +3,7 @@
 #include "GraphEdge.h"
 #include "bulkNode.h"
 #include "RandomGenerator.h"
+#include "bulkBuffer.h"
 class bulkLink:public GraphEdge
 {
 	private:

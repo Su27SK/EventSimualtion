@@ -6,10 +6,10 @@
  */
 bool bulkAgent::recv()
 {
-	slist<bulkLink*>* pLink = _node->getInputLink();
+	slist<bulkLink*>* pLink = _node.getInputLink();
 	slist<bulkLink*>::iterator iter = pLink->begin();
 	for (; iter != pLink->end(); iter++) {
-		recvToAgent(*iter);
+		recvToAgent(**iter);
 	}
 	return true;
 }
@@ -20,10 +20,10 @@ bool bulkAgent::recv()
  */
 bool bulkAgent::send()
 {
-	slist<bulkLink*>* pLink = _node->getOutputLink();
+	slist<bulkLink*>* pLink = _node.getOutputLink();
 	slist<bulkLink*>::iterator iter = pLink->begin();
 	for (; iter != pLink->end(); iter++) {
-		sendFromAgent(*iter);
+		sendFromAgent(**iter);
 	}
 	return true;
 }
@@ -36,12 +36,13 @@ bool bulkAgent::send()
 void bulkAgent::recvToAgent(bulkLink& link)
 {
 	int headId = link.getHeadId();
-	for (int i = 0; i < link.headbuf_.size(); i++) {
-		slist<bulkPacket>*  packets = link.pullPacketsFromBuf(i, headbuf_[i]->size());
+	vector<slist<bulkPacket>* >& buffers = link.headbuf_.getBuffers();
+	for (int i = 0; i < buffers.size(); i++) {
+		slist<bulkPacket>*  packets = link.pullPacketsFromBuf(i, buffers[i]->size());
 		while (!packets->empty()) {
-			bulkPacket& packet = link.headbuf_[i]->front();
+			bulkPacket& packet = buffers[i]->front();
 			_recvbuf[headId].push_back(packet);
-			link.headbuf_[i]->pop_front();
+			buffers[i]->pop_front();
 		}
 	}
 }
@@ -54,8 +55,9 @@ void bulkAgent::recvToAgent(bulkLink& link)
 void bulkAgent::sendFromAgent(bulkLink& link)
 {
 	int tailId = link.getTailId();
-	for (int i = 0; i < MAXSESSION ; i++) {
-		slist<bulkPacket>* pPacket = _sendbuf[tailId].pullPacketsFromBuf(i, _requestBuf[i]);
+	vector<slist<bulkPacket>* >& buffers = link.tailbuf_.getBuffers();
+	for (int i = 0; i < buffers.size(); i++) {
+		slist<bulkPacket>* pPacket = buffers[tailId].pullPacketsFromBuf(i, _requestBuf[i]);
 		while (!pPacket->empty()) {
 			bulkPacket& packet = pPacket->front();
 			link.tailbuf_.push_back(packet);

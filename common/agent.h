@@ -7,7 +7,7 @@ class Agent
 		int aId_;
 		double time_;
 	public:
-		Agent():Agent() {
+		Agent() {
 			aId_ = -1;
 			time_ = -1; 
 		}

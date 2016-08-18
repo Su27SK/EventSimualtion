@@ -2,6 +2,7 @@
 #define _BULKBUFFER_H_
 #define MAXSESSION 20
 #include <ext/slist>
+#include <vector>
 #include "bulkPacket.h"
 using namespace __gnu_cxx;
 class bulkBuffer

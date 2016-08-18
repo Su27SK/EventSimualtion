@@ -1,7 +1,6 @@
 #ifndef _BULKLINK_H_
 #define _BULKLINK_H_
 #include "GraphEdge.h"
-#include "bulkNode.h"
 #include "RandomGenerator.h"
 #include "bulkBuffer.h"
 class bulkLink:public GraphEdge

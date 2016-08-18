@@ -7,14 +7,14 @@
  */
 void bulkBuffer::pushPacketsToBuf(int sId, bulkPacket& packet)
 {
-	_buffers[sId]->push_back(packet);
+	_buffers[sId]->push_front(packet);
 }
 
 /**
  * @brief pullPacketsFromBuf 
  * 将数据包移出session id下的缓存
  * @param {interge} sId
- * @param {bulkPacket} packet
+ * @param {interge} num
  *
  * @return {slist<bulkPacket>}
  */
@@ -23,8 +23,8 @@ slist<bulkPacket>* bulkBuffer::pullPacketsFromBuf(int sId, int num)
 	slist<bulkPacket>* pPackets = new slist<bulkPacket>();
 	int count = 0;
 	while (!_buffers[sId]->empty() && count < num) {
-		bulPacket& packet = _buffers[sId]->front();
-		pPackets->push_back(packet);
+		bulkPacket& packet = _buffers[sId]->front();
+		pPackets->push_front(packet);
 		_buffers[sId]->pop_front();
 		count++;
 	}

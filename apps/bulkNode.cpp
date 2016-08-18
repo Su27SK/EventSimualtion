@@ -94,11 +94,11 @@ slist<bulkLink*>* bulkNode::getInputLink()
 }
 
 /**
- * @brief getOutputLink 
+ * @brief getOutputNum
  *
  * @return {interge}
  */
-int bulkNode::getOutputLink()
+int bulkNode::getOutputNum()
 {
 	return output_->size();
 }
@@ -108,7 +108,7 @@ int bulkNode::getOutputLink()
  *
  * @return {interge}
  */
-int bulkNode::getInputLink()
+int bulkNode::getInputNum()
 {
 	return input_->size();
 }
@@ -120,7 +120,7 @@ int bulkNode::getInputLink()
 */
 void bulkNode::addOutputLink(bulkLink* link)
 {
-	link->setTailId(output->size());
+	link->setTailId(output_->size());
 	output_->push_front(link);
 }
 
@@ -131,6 +131,6 @@ void bulkNode::addOutputLink(bulkLink* link)
  */
 void bulkNode::addInputLink(bulkLink* link)
 {
-	link->setHeadId(input->size());
+	link->setHeadId(input_->size());
 	input_->push_front(link);
 }

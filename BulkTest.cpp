@@ -7,5 +7,6 @@ int main(int argc, char* argv[])
 {
 	Graph* graph = Graph::importGraph("Bulk_Config_File/normalDis2.txt");
 	bulkNetwork* network = new bulkNetwork(graph);
+	cout<<"Hello World"<<endl;
 	return 0;
 }

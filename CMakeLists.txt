@@ -13,6 +13,8 @@ project (Network)
 # 找到头文件
 include_directories(apps)
 include_directories(topology)
+include_directories(common)
+include_directories(lib)
 
 # 查找当前目录下面的所有源文件
 # 并将名称保存到 DIR_SRCS 变量
@@ -26,6 +28,8 @@ add_subdirectory(topology)
 add_subdirectory(common)
 
 add_subdirectory(apps)
+
+add_subdirectory(exception)
 
 # 指定生成目标
 add_executable(BulkTest BulkTest.cpp)

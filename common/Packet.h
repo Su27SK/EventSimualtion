@@ -30,6 +30,6 @@ class Packet
 		string getPacketUnit();
 		Packet& operator = (const Packet& packet);
 		bool convertToType(int degree, bool isLarge = true);
-		~Packet();
+		virtual ~Packet(){}
 };
 #endif

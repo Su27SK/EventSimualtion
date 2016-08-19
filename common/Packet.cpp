@@ -151,8 +151,3 @@ bool Packet::convertToType(int degree, bool isLarge)
 		return false;
 	}
 }
-
-Packet::~Packet()
-{
-	//cout<<"Decontruct Packet"<<endl;
-}

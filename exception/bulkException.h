@@ -4,7 +4,7 @@
 class bulkException: public baseException
 {
 	public:
-		bulkException(string msg) throw(): baseException(msg);
+		bulkException(string msg) throw(): baseException(msg){};
 		~bulkException() throw() {}
 		string getClassName() const
 		{

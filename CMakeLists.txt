@@ -11,10 +11,12 @@ endif()
 project (Network)
 
 # 找到头文件
+include_directories(exception)
+include_directories(lib)
 include_directories(apps)
 include_directories(topology)
 include_directories(common)
-include_directories(lib)
+
 
 # 查找当前目录下面的所有源文件
 # 并将名称保存到 DIR_SRCS 变量
@@ -35,7 +37,7 @@ add_subdirectory(exception)
 add_executable(BulkTest BulkTest.cpp)
 
 # 添加链路库
-target_link_libraries(BulkTest apps lib common topology)
+target_link_libraries(BulkTest apps lib common topology exception)
 
 set (CMAKE_CXX_COMPILER "g++") # 显示指定使用的 C++编译器
 

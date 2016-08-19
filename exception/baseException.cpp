@@ -7,8 +7,6 @@
 
 #include "baseException.h"
 
-using namespace std;
-
 baseException::baseException(const string& msg) throw() : mMsg_(msg), mFile_("<unknow file>"), mFunc_("<unknow func>"), mLine_(-1), _mStackTraceSize(0) {}
 
 baseException::~baseException() throw()

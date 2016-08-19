@@ -11,6 +11,7 @@ endif()
 include_directories(../common)
 include_directories(../topology)
 include_directories(../lib)
+include_directories(../exception)
 
 # 查找当前目录下面的所有源文件
 # 并将名称保存到 DIR_SRCS 变量

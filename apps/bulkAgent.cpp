@@ -1,5 +1,4 @@
 #include "bulkAgent.h"
-
 /**
  * @brief recv 
  * @return {boolean} 
@@ -36,14 +35,15 @@ bool bulkAgent::send()
 void bulkAgent::recvToAgent(bulkLink& link)
 {
 	int headId = link.getHeadId();
-	vector<slist<bulkPacket>* >& buffers = link.headbuf_.getBuffers();
-	for (int i = 0; i < buffers.size(); i++) {
-		slist<bulkPacket>*  packets = link.headbuf_.pullPacketsFromBuf(i, buffers[i]->size());
+	for (int i = 0; i < MAXSESSION; i++) {
+		slist<bulkPacket>*  packets = link.headbuf_.getPacketsStore(i);
 		while (!packets->empty()) {
-			bulkPacket& packet = buffers[i]->front();
+			bulkPacket& packet = packets->front();
 			_recvbuf[headId].pushPacketsToBuf(i, packet);
-			buffers[i]->pop_front();
+			packets->pop_front();
 		}
+		packets->~slist();
+		packets = NULL;
 	}
 }
 
@@ -55,35 +55,67 @@ void bulkAgent::recvToAgent(bulkLink& link)
 void bulkAgent::sendFromAgent(bulkLink& link)
 {
 	int tailId = link.getTailId();
-	vector<slist<bulkPacket>* >& buffers = _sendbuf[tailId].getBuffers();
-	for (int i = 0; i < buffers.size(); i++) {
-		slist<bulkPacket>* pPacket = _sendbuf[tailId].pullPacketsFromBuf(i, _requestBuf[i]);
-		while (!pPacket->empty()) {
-			bulkPacket& packet = pPacket->front();
+	for (int i = 0; i < MAXSESSION; i++) {
+		slist<bulkPacket>* packets = _sendbuf[tailId].pullPacketsFromBuf(i, _requestBuf[tailId][i]);
+		while (!packets->empty()) {
+			bulkPacket& packet = packets->front();
 			link.tailbuf_.pushPacketsToBuf(i, packet);
-			pPacket->pop_front();
+			packets->pop_front();
 		}
+		packets->~slist();
+		packets = NULL;
 	}
 }
 
 /**
- * @brief getStoreAmount 
- * 获得该节点存储的数据包总数
+ * @brief getStore 
+ * 获得该节点存储的数据包
  * @param {interge} sId
  *
- * @return {interge}
+ * @return {slist<bulkPacket>*}
  */
-int bulkAgent::getStoreAmount(int sId)
+slist<bulkPacket>* bulkAgent::getStore(int sId)
 {
 	vector<bulkBuffer>::iterator iter;
-	int num = 0;
-	for (iter = _sendbuf.begin(); iter != _sendbuf.end(); iter++) {
-		num += iter->getPacketsAmount(sId);
+	slist<bulkPacket>* sum;
+	int tag = OUT; 
+	vector<bulkBuffer>* pBuf = &_sendbuf;
+	while (tag != DEFAULT) {
+		for (iter = pBuf->begin(); iter != pBuf->end(); iter++) {
+			slist<bulkPacket>* pPacket = iter->getPacketsStore(sId);
+			while (!pPacket->empty()) {
+				bulkPacket& packet = pPacket->front();
+				sum->push_front(packet);
+				pPacket->pop_front();
+			}
+		}
+		pBuf = &_recvbuf;
+		tag++;
 	}
-	for (iter = _recvbuf.begin(); iter != _recvbuf.end(); iter++) {
-		num += iter->getPacketsAmount(sId);
+	return sum;
+}
+
+/**
+ * @brief getAllWeight 
+ * 获得所有E[c(e)(t)]期望倒数之和
+ * @return {double}
+ */
+double bulkAgent::getAllWeight()
+{
+	slist<bulkLink*>::iterator iter;
+	double sumWeight = 0, singleWeight;
+	int tag = OUT;
+	slist<bulkLink*>* pLink = _node.getOutputLink();
+	while (tag != DEFAULT) {
+		for (iter = pLink->begin(); iter != pLink->end(); iter++) {
+			if ((singleWeight = (*iter)->getWeight()) != 0) {
+				sumWeight += 1 / singleWeight;
+			}
+		}
+		pLink = _node.getInputLink();
+		tag++;
 	}
-	return num;
+	return sumWeight;
 }
 
 /**
@@ -95,7 +127,43 @@ int bulkAgent::getStoreAmount(int sId)
  */
 int bulkAgent::reallocPackets(int sId)
 {
-	
+	slist<bulkPacket>* qsv = getStore(sId);
+	double sum = qsv->size();
+	double allWeight = getAllWeight();
+	double singleWeight;
+	int tag = OUT;
+	slist<bulkLink*>::iterator iter;
+	slist<bulkLink*>* pLink = _node.getOutputLink();
+	while (tag != DEFAULT) {
+		for (iter = pLink->begin(); iter != pLink->end(); iter++) {
+			if ((singleWeight = (*iter)->getWeight()) != 0) { 
+				int count = 0, index;
+				double proportion = (1/singleWeight) / allWeight;
+				double num = ROUND(sum * proportion);
+				bulkBuffer* pBuf;
+				int* bufSum;
+				if (tag == OUT) {
+					index = (*iter)->getTailId();
+					bufSum = &outBufSum_[index][sId];
+					pBuf = &_sendbuf[index];
+				} else if (tag == IN) {
+					index = (*iter)->getHeadId();
+					bufSum = &inBufSum_[index][sId];			
+					pBuf = &_recvbuf[index];
+				}
+				while (!qsv->empty() && count < num) {
+					bulkPacket& packet = qsv->front();
+					pBuf->pushPacketsToBuf(sId, packet);
+					qsv->pop_front();
+					count++;
+				}
+				*bufSum = count;
+			}
+			pLink = _node.getInputLink();
+			tag++;
+		}
+	}
+	return (int)sum;
 }
 
 /**
@@ -126,5 +194,5 @@ void bulkAgent::setRecvBuf(int num)
 
 void bulkAgent::reallocAll()
 {
-
+	
 }

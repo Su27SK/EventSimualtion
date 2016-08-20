@@ -194,5 +194,7 @@ void bulkAgent::setRecvBuf(int num)
 
 void bulkAgent::reallocAll()
 {
-	
+	for (int i = 0; i < MAXSESSION; i++) {
+		reallocPackets(i);
+	}
 }

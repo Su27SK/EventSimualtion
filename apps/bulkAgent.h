@@ -12,25 +12,19 @@ class bulkAgent:public Agent
 	private:
 		enum {OUT = 1, IN = 2, DEFAULT = 3};
 		bulkNode _node;
-		vector<bulkBuffer> _sendbuf; //tail
-		vector<bulkBuffer> _recvbuf; //head
+		vector<bulkBuffer> _sendbuf; //tail buffers
+		vector<bulkBuffer> _recvbuf; //head buffers
 		vector<vector<int> > _requestBuf;     //每条发送链路上各个session需要发送的数据量
+		double _computeS(map<double, int>& sorted, bulkLink link, double capacity);
 		int _aId;
 	public:
-		vector<vector<int> > outBufSum_;      //出去链路目前缓存数据包数量
-		vector<vector<int> > inBufSum_;       //进入链路目前缓存数据包数量
 		bulkAgent(int aId, bulkNode node):Agent()
 		{
 			_aId = aId;
 			_node = node;
 			for (int i = 0; i < _node.getOutputNum(); i++) {
-				vector<int> temp(MAXSESSION);
+				vector<int> temp(MAXSESSION + 1);
 				_requestBuf.push_back(temp);
-				outBufSum_.push_back(temp);
-			}
-			for (int i = 0; i < _node.getInputNum(); i++) {
-				vector<int> temp(MAXSESSION);
-				inBufSum_.push_back(temp);
 			}
 			setSendBuf(_node.getOutputNum()); 
 			setRecvBuf(_node.getInputNum());
@@ -44,6 +38,9 @@ class bulkAgent:public Agent
 		slist<bulkPacket>* getStore(int sId);
 		double getAllWeight();
 		int reallocPackets(int sId);
+		float reallocRequests(bulkLink& link);
+		int getAId() const;
 		void reallocAll();
+		void reallocAllRequests();
 };
 #endif

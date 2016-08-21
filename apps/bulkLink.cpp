@@ -68,3 +68,29 @@ int bulkLink::getHeadId()
 {
 	return _headId;
 }
+
+void bulkLink::transfer()
+{
+	for (int i = 1; i <= MAXSESSION; i++) {
+		slist<bulkPacket>* packets = tailbuf_.getPacketsStore(i);
+		while (!packets->empty()) {
+			bulkPacket& packet = packets->front();
+			headbuf_.pushPacketsToBuf(i, packet);
+			packets->pop_front();
+		}
+		packets->slist();
+		packets = NULL;
+	}
+}
+
+/**
+ * @brief diffPackets 
+ *
+ * @param {interge} sId
+ *
+ * @return {interge}
+ */
+int bulkLink::diffPackets(int sId)
+{
+	return tailBufNum[sId] - headBufNum[sId];
+}

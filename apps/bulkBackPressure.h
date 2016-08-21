@@ -1,21 +1,22 @@
 #ifndef _BULKBACKPRESSURE_H_
 #define _BULKBACKPRESSURE_H_
-#include "bulkBackHandle.h"
 #include "bulkNetwork.h"
+#include "bulkAgent.h"
 #include <string.h>
 #define THRESHOLD 0.1 //ε
 class bulkBackPressure:public bulkNetwork
 {
 	private:
 		double _computeS(map<double, int>& sorted, bulkLink link, double capacity);
-		void _realloc();
+		vector<bulkAgent> _agents;
 	public:
-		bulkBackPressure():bulkNetwork() {}
+		bulkBackPressure():bulkNetwork() {
+			vector<bulkNode>::iterator iter = nList_.begin();
+			for (; iter != nList_end(); iter++) {
+				bulkAgent* agent = new bulkAgent(iter->getNodeId(), *iter);
+				_agents.push_back(*agent);
+			}
+		}
 		virtual void handle();
-		//virtual void dynamicPush(BulkLink& link);
-		virtual float dynamicPush(bulkLink& link);
-		void propagate(queue<int>* q, int* visited);
-		void pushPacketsOut(int nodeId);
-		double getCapacityFromFile(double time, int source, int sink);
 };
 #endif

@@ -8,7 +8,7 @@
  */
 int bulkBuffer::_check(int sId)
 {
-	if (sId < 0 || sId >= MAXSESSION) {
+	if (sId < 1 || sId >= MAXSESSION) {
 		throw new bulkException("sId is overstep the boundary in buffers module");
 	}
 	return sId;

@@ -1,6 +1,6 @@
 #ifndef _BULKBUFFER_H_
 #define _BULKBUFFER_H_
-#define MAXSESSION 20
+#include "config.h"
 #include <ext/slist>
 #include <vector>
 #include "bulkPacket.h"
@@ -16,7 +16,7 @@ class bulkBuffer
 		void _handleOverException(bulkException e) const;
 	public:
 		bulkBuffer() {
-			_buffers.resize(MAXSESSION);
+			_buffers.resize(MAXSESSION + 1);
 			vector<slist<bulkPacket>* >::iterator iter;
 			for (iter = _buffers.begin(); iter != _buffers.end(); iter++) {
 				*iter = new slist<bulkPacket>();

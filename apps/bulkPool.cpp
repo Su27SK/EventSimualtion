@@ -1,26 +1,18 @@
-#include "BulkPool.h"
-BulkPool::BulkPool():_packets(new BulkPackets())
+#include "bulkPool.h"
+bulkPool::bulkPool()
 {
-	this->_pool = new slist<BulkPackets>(0);
-}
-
-BulkPool::BulkPool(BulkPackets* packetsModel)
-{
-	this->_pool = new slist<BulkPackets>(0);
-	this->_packets = packetsModel;
-	this->_packets->addPtr();
+	_pool = new slist<bulkPacket>(0);
 }
 
 /**
  * @brief init 
- * 初始化100个数据包
+ * 初始化INITSIZE个数据包
  */
-void BulkPool::init()
+void bulkPool::init()
 {
-	for (int i = 0; i < this->INITSIZE; i++) {
-		BulkPackets* newPackets = new BulkPackets();
-		*newPackets  = *this->_packets;
-		this->_pool->push_front(*newPackets);
+	for (int i = 0; i < INITSIZE; i++) {
+		bulkPacket* packet = new bulkPacket();
+		_pool->push_front(*packet);
 	}
 }
 
@@ -28,60 +20,52 @@ void BulkPool::init()
  * @brief destroy
  * 销毁所有的数据包
  */
-void BulkPool::destroy()
+void bulkPool::destroy()
 {
-	slist<BulkPackets>::iterator iterStart;
-	slist<BulkPackets>::iterator iterEnd;
-	iterStart = this->_pool->begin();
-	iterEnd = this->_pool->end();
+	slist<bulkPacket>::iterator iterStart;
+	slist<bulkPacket>::iterator iterEnd;
+	iterStart = _pool->begin();
+	iterEnd = _pool->end();
 	if (iterStart != iterEnd) {
-		this->_pool->erase(iterStart, iterEnd);
+		_pool->erase(iterStart, iterEnd);
 	}
 }
 
 /**
  * @brief placePacketsToPool 
  *
- * @param {BulkPackets*} packets
+ * @param {bulkPacket*} packets
  */
-void BulkPool::placePacketsToPool(BulkPackets* packets)
+void bulkPool::placePacketsToPool(bulkPacket* packets)
 {
-	this->_pool->push_front(*packets);
+	_pool->push_front(*packets);
 }
 
 /**
  * @brief getPacketsFromPool 
  * 从内存池中获得数据包
- * @return {BulkPackets*}
+ * @return {bulkPacket*}
  */
-BulkPackets* BulkPool::getPacketsFromPool()
+bulkPacket* bulkPool::getPacketsFromPool()
 {
 	if (!this->_pool->empty()) {
-		BulkPackets* packets = new BulkPackets();
-		*packets = *this->_pool->begin();
-		this->_pool->pop_front();
-		return packets;
+		bulkPacket* packet = _pool->front();
+		_pool->pop_front();
+		return packet;
 	} else {
-		this->init();
-		return this->getPacketsFromPool();
+		init();
+		return getPacketsFromPool();
 	}
 }
 
-void BulkPool::setPacketsType(BulkPackets* type)
+/**
+ * @brief ~bulkPool 
+ * 析构函数
+ */
+bulkPool::~bulkPool()
 {
-	this->_packets = type;
-}
-
-BulkPool::~BulkPool()
-{
-	if (this->_packets->getPtr() == 1) {
-		delete this->_packets;
-	} else {
-		this->_packets->reducePtr();
-	}
 	//cout<<"Delete Pool"<<endl;
 	this->_pool->~slist();
-	this->_packets = NULL;
 	this->_pool = NULL;
 }
 

@@ -44,12 +44,12 @@ void bulkPool::placePacketsToPool(bulkPacket* packets)
 /**
  * @brief getPacketsFromPool 
  * 从内存池中获得数据包
- * @return {bulkPacket*}
+ * @return {bulkPacket&}
  */
-bulkPacket* bulkPool::getPacketsFromPool()
+bulkPacket& bulkPool::getPacketsFromPool()
 {
 	if (!this->_pool->empty()) {
-		bulkPacket* packet = _pool->front();
+		bulkPacket& packet = _pool->front();
 		_pool->pop_front();
 		return packet;
 	} else {

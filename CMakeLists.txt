@@ -10,6 +10,10 @@ endif()
 # 项目信息
 project (Network)
 
+# find the gsl module
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(gsl REQUIRED gsl)
+
 # 找到头文件
 include_directories(exception)
 include_directories(lib)
@@ -37,9 +41,14 @@ add_subdirectory(exception)
 add_executable(BulkTest BulkTest.cpp)
 
 # 添加链路库
-target_link_libraries(BulkTest apps lib common topology exception)
+target_link_libraries(BulkTest apps lib common topology exception ${gsl_LIBRARIES})
 
 set (CMAKE_CXX_COMPILER "g++") # 显示指定使用的 C++编译器
+set (CMAKE_CXX_FLAGS  "-g")
+set (CMAKE_CXX_FLAGS  "-Wall")
+#set (CMAKE_CXX_FLAGS  "-I /usr/local/include")
+set (CMAKE_CXX_FLAGS  "-L /usr/local/lib")
+set (CMAKE_CXX_FLAGS  "-lgsl -lgslcblas -lm")
 
 if (APPLE) 
 	set (CMAKE_CXX_FLAGS "-stdlib=libstdc++") 

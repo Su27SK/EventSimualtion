@@ -23,7 +23,7 @@ add_library(apps ${DIR_LIB_SRCS})
 set (CMAKE_CXX_FLAGS "-g")
 set (CMAKE_CXX_FLAGS "-Wall")
 set (CMAKE_CXX_FLAGS "-I/usr/local/include")
-set (CMAKE_CXX_FLAGS "-L/usr/local/lib")
+#set (CMAKE_CXX_FLAGS "-L/usr/local/lib")
 
 if (APPLE) 
 	set (CMAKE_CXX_FLAGS "-stdlib=libstdc++") 

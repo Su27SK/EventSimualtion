@@ -145,11 +145,11 @@ int bulkAgent::reallocPackets(int sId)
 				int* bufSum;
 				if (tag == OUT) {
 					index = (*iter)->getTailId();
-					bufSum = &(iter->tailBufNum_[sId]);
+					bufSum = &((*iter)->tailBufNum_[sId]);
 					pBuf = &_sendbuf[index];
 				} else if (tag == IN) {
 					index = (*iter)->getHeadId();
-					bufSum = &(iter->headBufNum_[sId]);
+					bufSum = &((*iter)->headBufNum_[sId]);
 					pBuf = &_recvbuf[index];
 				}
 				while (!qsv->empty() && count < num) {
@@ -207,7 +207,7 @@ float bulkAgent::reallocRequests(bulkLink& link)
 				fiNum--;
 			}
 		    fsum += fi * (difference - fi) / pow (demand, 2);
-			_requestBuf[tailId] = fi;
+			_requestBuf[tailId][sId] = fi;
 		}
 	}
 	return fsum;

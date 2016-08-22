@@ -1,8 +1,10 @@
 #ifndef _BULKAGENT_H_
 #define _BULKAGENT_H_
 #define ROUND(x) ((x) > 0.0 ? floor((x) + 0.5) : ceil((x) - 0.5));
+#define THRESHOLD 0.1 //ε
 #include <ext/slist>
 #include <vector>
+#include <map>
 #include "agent.h"
 #include "bulkNode.h"
 #include "bulkBuffer.h"

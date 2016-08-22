@@ -78,7 +78,7 @@ void bulkLink::transfer()
 			headbuf_.pushPacketsToBuf(i, packet);
 			packets->pop_front();
 		}
-		packets->slist();
+		packets->~slist();
 		packets = NULL;
 	}
 }
@@ -92,5 +92,5 @@ void bulkLink::transfer()
  */
 int bulkLink::diffPackets(int sId)
 {
-	return tailBufNum[sId] - headBufNum[sId];
+	return tailBufNum_[sId] - headBufNum_[sId];
 }

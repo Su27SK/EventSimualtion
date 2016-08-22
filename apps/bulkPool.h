@@ -1,6 +1,8 @@
 #ifndef	_BULKPOOL_H_
 #define _BULKPOOL_H_
+#include <ext/slist>
 #include "bulkPacket.h"
+using namespace __gnu_cxx;
 class bulkPool
 {
 	private:
@@ -13,6 +15,6 @@ class bulkPool
 		void init();
 		void destroy();
 		void placePacketsToPool(bulkPacket* packets);
-		bulkPacket* getPacketsFromPool();
+		bulkPacket& getPacketsFromPool();
 };
 #endif

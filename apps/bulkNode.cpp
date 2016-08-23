@@ -34,38 +34,44 @@ bulkNode::bulkNode(GraphNode& node):GraphNode(node)
 /**
  * @brief setOriginal 
  * 设置该节点为session起点
+ * @param {interge} sId
+ *
  * @return {bulkNode}
  */
-bulkNode& bulkNode::setOriginal()
+bulkNode& bulkNode::setOriginal(int sId)
 {
 	_isOriginal = true;
+	originalIds_.insert(sId);
 	return *this;
 }
 
 /**
  * @brief setTerminal 
  * 设置该节点为session终节点
+ * @param {interge} sId
+ *
  * @return {bulkNode}
  */
-bulkNode& bulkNode::setTerminal()
+bulkNode& bulkNode::setTerminal(int sId)
 {
 	_isTerminal = true;
+	terminalIds_.insert(sId);
 	return *this;
 }
 
 /**
  * @brief getTerminal 
- * 获得flag, 判断是否是出口点
+ *
  * @return {boolean}
  */
-bool bulkNode:: getTerminal()
+bool bulkNode::getTerminal()
 {
 	return _isTerminal;
 }
 
 /**
  * @brief getOriginal 
- * 获得flag, 判断是否是起始点
+ *
  * @return {boolean}
  */
 bool bulkNode::getOriginal()

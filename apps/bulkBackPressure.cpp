@@ -26,3 +26,42 @@ void bulkBackPressure::_initAgents()
 		_agents.push_back(*agent);
 	}
 }
+
+/**
+ * @brief inputPackets 
+ *
+ * @param {interge} sId
+ */
+void bulkBackPressure::inputPackets(int sId)
+{
+	try {
+		check(sId, 1, MAXSESSION + 1);
+		int m = sToDemand[sId];
+		int nPacket = RandomGenerator::genPoissonInt(m);
+		
+	} catch (bulkException e) {
+		handleOverException(e);
+	}
+}
+
+/**
+ * @brief setSession 
+ *
+ * @param {interge} sId
+ * @param {double} demand
+ *
+ * @return {bulkBackPressure}
+ */
+bulkBackPressure& bulkBackPressure::setSession(int sId, double demand)
+{
+	try {
+		check(sId, 1, MAXSESSION + 1);
+		if (demand < 0) {
+			demand = 0;
+		}
+		sToDemand[sId] = demand;
+		return *this;
+	} catch (bulkException e) {
+		handleOverException(e);
+	}
+}

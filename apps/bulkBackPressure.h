@@ -7,7 +7,6 @@
 class bulkBackPressure:public bulkNetwork
 {
 	private:
-		double _computeS(map<double, int>& sorted, bulkLink link, double capacity);
 		void _initAgents();
 		vector<bulkAgent> _agents;
 	public:
@@ -17,6 +16,8 @@ class bulkBackPressure:public bulkNetwork
 		bulkBackPressure(Graph* graph): bulkNetwork(graph) {
 			_initAgents();
 		}
+		void inputPackets(int sId);
+		bulkBackPressure& setSession(int sId, double demand);
 		virtual void handle();
 };
 #endif

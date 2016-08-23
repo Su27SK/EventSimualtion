@@ -36,13 +36,27 @@ bool bulkAgent::send()
 void bulkAgent::recvToAgent(bulkLink& link)
 {
 	int headId = link.getHeadId();
+	//consider the sink node
+	if (!_node.getTerminal()) {
+		set<int>::iterator iter = _node.terminalIds_.begin();
+		for (; iter != _node.terminalIds_.end(); iter++) {
+			slist<bulkPacket>*  packets = link.headbuf_.getPacketsStore(*iter);
+			while (!packets->empty()) {
+				bulkPacket& packet = packets->front();
+				pool.placePacketsToPool(&packet);
+				packets->pop_front();
+			} 
+			packets->~slist();
+			packets = NULL;
+		}
+	}
 	for (int i = 1; i <= MAXSESSION; i++) {
 		slist<bulkPacket>*  packets = link.headbuf_.getPacketsStore(i);
 		while (!packets->empty()) {
 			bulkPacket& packet = packets->front();
 			_recvbuf[headId].pushPacketsToBuf(i, packet);
 			packets->pop_front();
-		}
+		} 
 		packets->~slist();
 		packets = NULL;
 	}

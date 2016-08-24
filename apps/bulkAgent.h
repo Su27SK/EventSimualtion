@@ -20,6 +20,7 @@ class bulkAgent:public Agent
 		double _computeS(map<double, int>& sorted, bulkLink link, double capacity);
 		int _aId;
 	public:
+		bool fake_; //判断是否是伪Agent;
 		bulkAgent(int aId, bulkNode node):Agent()
 		{
 			_aId = aId;
@@ -28,8 +29,9 @@ class bulkAgent:public Agent
 				vector<int> temp(MAXSESSION + 1);
 				_requestBuf.push_back(temp);
 			}
-			setSendBuf(_node.getOutputNum()); 
-			setRecvBuf(_node.getInputNum());
+			setSendBuf(_node.getOutputNum() + 1); 
+			setRecvBuf(_node.getInputNum() + 1);
+			fake_ = false;
 		}
 		virtual bool recv();
 		virtual bool send();
@@ -37,6 +39,9 @@ class bulkAgent:public Agent
 		void setRecvBuf(int num);
 		void recvToAgent(bulkLink& link);
 		void sendFromAgent(bulkLink& link);
+		void addVirtualInputLink(bulkLink* link);
+		void addVirtualOutputLink(bulkLink* link);
+		void inputVirualNode(bulkPacket& packet, int sId);
 		slist<bulkPacket>* getStore(int sId);
 		double getAllWeight();
 		int reallocPackets(int sId);

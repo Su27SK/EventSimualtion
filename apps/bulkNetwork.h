@@ -12,7 +12,6 @@ class bulkNetwork
 		int nSource_; //有几个Source流入点
 		int nSink_;   //有几个Sink流出点
 		map<int, bulkNode>* sourceList_; //具体流入source数据包节点索引
-		
 		map<int, bulkNode>* sinkList_;   //具体流出sink数据包节点索引
 		vector<bulkNode> nList_;         //node节点
 		Graph* topology_;

@@ -8,15 +8,17 @@ class bulkBackPressure:public bulkNetwork
 {
 	private:
 		void _initAgents();
-		vector<bulkAgent> _agents;
+		void _initVirtualAgents();
+		void _inputPackets(bulkAgent* vAgent, int sId);
+		vector<bulkAgent*> _agents;
+		vector<bulkAgent*> _vAgents; //虚拟Agents
 	public:
-		bulkBackPressure():bulkNetwork() {
-			_initAgents();
-		}
+		bulkBackPressure():bulkNetwork() {}
 		bulkBackPressure(Graph* graph): bulkNetwork(graph) {
+			_initVirtualAgents();
 			_initAgents();
 		}
-		void inputPackets(int sId);
+		void inputPackets();
 		bulkBackPressure& setSession(int sId, double demand);
 		virtual void handle();
 };

@@ -70,8 +70,13 @@ void bulkAgent::recvToAgent(bulkLink& link)
 void bulkAgent::sendFromAgent(bulkLink& link)
 {
 	int tailId = link.getTailId();
+	slist<bulkPacket>* packets;
 	for (int i = 1; i <= MAXSESSION; i++) {
-		slist<bulkPacket>* packets = _sendbuf[tailId].pullPacketsFromBuf(i, _requestBuf[tailId][i]);
+		if (!fake_) {
+			packets = _sendbuf[tailId].pullPacketsFromBuf(i, _requestBuf[tailId][i]);
+		} else {
+			packets = _sendbuf[tailId].getPacketsStore(i);
+		}
 		while (!packets->empty()) {
 			bulkPacket& packet = packets->front();
 			link.tailbuf_.pushPacketsToBuf(i, packet);
@@ -341,4 +346,39 @@ void bulkAgent::reallocAllRequests()
 	for (; iter != pLink->end(); iter++) {
 		reallocRequests(**iter);
 	}
+}
+
+/**
+ * @brief addVirtualInputLink 
+ * 增加虚拟进入链路
+ * @param {bulkLink*} link
+ */
+void bulkAgent::addVirtualInputLink(bulkLink* link)
+{
+	if (fake_) {
+		_node.addInputLink(link);
+	}
+}
+
+/**
+ * @brief addVirtualOutputLink 
+ * 增加虚拟出去链路
+ * @param {bulkLink*} link
+ */
+void bulkAgent::addVirtualOutputLink(bulkLink* link)
+{
+	if (fake_) {
+		_node.addOutputLink(link);
+	}
+}
+
+/**
+ * @brief inputVirualNode 
+ *
+ * @param {bulkPacket&} packet
+ * @param {interge} sId
+ */
+void bulkAgent::inputVirualNode(bulkPacket& packet, int sId) 
+{
+	_sendbuf[0].pushPacketsToBuf(sId, packet);
 }

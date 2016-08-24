@@ -83,8 +83,8 @@ bulkNetwork& bulkNetwork::setSourceNode(int id, int sId)
 		int n = topology_->getVertices();
 		check(id, 1, n + 1);
 		check(sId, 1, MAXSESSION + 1);
-		sourceList_->insert(pair<int, bulkNode>(id, nList_[id]));
 		nList_[id].setOriginal(sId);
+		sourceList_->insert(pair<int, bulkNode>(id, nList_[id]));
 		nSource_++;
 		return *this;
 	} catch (bulkException e) {
@@ -106,8 +106,8 @@ bulkNetwork& bulkNetwork::setSinkNode(int id, int sId)
 		int n = topology_->getVertices();
 		check(id, 1, n + 1);
 		check(id, 1, MAXSESSION + 1);
-		sinkList_->insert(pair<int, bulkNode>(id, nList_[id]));
 		nList_[id].setTerminal(sId);
+		sinkList_->insert(pair<int, bulkNode>(id, nList_[id]));
 		nSink_++;
 		return *this;
 	} catch (bulkException e) {

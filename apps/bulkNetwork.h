@@ -1,6 +1,6 @@
 #ifndef  _BULKNETWORK_H_ 
 #define  _BULKNETWORK_H_
-#define MAXNODE 300
+#define  MAXNODE 300
 #include "Graph.h"
 #include "bulkNode.h"
 #include "bulkException.h"
@@ -11,14 +11,12 @@ class bulkNetwork
 	protected:
 		int nSource_; //有几个Source流入点
 		int nSink_;   //有几个Sink流出点
-		map<int, bulkNode>* sourceList_; //具体流入source数据包节点索引
-		map<int, bulkNode>* sinkList_;   //具体流出sink数据包节点索引
+		map<int, bulkNode*> sourceList_; //具体流入source数据包节点索引
+		map<int, bulkNode*> sinkList_;   //具体流出sink数据包节点索引
 		vector<bulkNode> nList_;         //node节点
 		Graph* topology_;
 	public:
 		bulkNetwork():nSource_(0), nSink_(0) {
-			sourceList_ = new map<int, bulkNode>;
-			sinkList_ = new map<int, bulkNode>;
 			topology_ = NULL;
 		}
 		void init();

@@ -1,4 +1,15 @@
 #include "bulkLink.h"
+
+/**
+ * @brief _init 
+ */
+void bulkLink::_init()
+{
+	_tailId = _headId = -1;
+	tailBufNum_.resize(MAXSESSION + 1);
+	headBufNum_.resize(MAXSESSION + 1);
+}
+
 /**
  * @brief getCapacity 
  * 获得时刻改变的链路带宽

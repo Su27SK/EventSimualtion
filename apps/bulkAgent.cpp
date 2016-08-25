@@ -21,6 +21,7 @@ bool bulkAgent::send()
 {
 	slist<bulkLink*>* pLink = _node.getOutputLink();
 	slist<bulkLink*>::iterator iter = pLink->begin();
+	reallocAllRequests();
 	for (; iter != pLink->end(); iter++) {
 		sendFromAgent(**iter);
 		(*iter)->transfer();
@@ -37,7 +38,7 @@ void bulkAgent::recvToAgent(bulkLink& link)
 {
 	int headId = link.getHeadId();
 	//consider the sink node
-	if (!_node.getTerminal()) {
+	if (_node.getTerminal()) {
 		set<int>::iterator iter = _node.terminalIds_.begin();
 		for (; iter != _node.terminalIds_.end(); iter++) {
 			slist<bulkPacket>*  packets = link.headbuf_.getPacketsStore(*iter);
@@ -97,7 +98,7 @@ void bulkAgent::sendFromAgent(bulkLink& link)
 slist<bulkPacket>* bulkAgent::getStore(int sId)
 {
 	vector<bulkBuffer>::iterator iter;
-	slist<bulkPacket>* sum;
+	slist<bulkPacket>* sum = NULL;
 	int tag = OUT; 
 	vector<bulkBuffer>* pBuf = &_sendbuf;
 	while (tag != DEFAULT) {
@@ -148,6 +149,9 @@ double bulkAgent::getAllWeight()
 int bulkAgent::reallocPackets(int sId)
 {
 	slist<bulkPacket>* qsv = getStore(sId);
+	if (qsv == NULL) {
+		return 0;
+	}
 	double sum = qsv->size();
 	double allWeight = getAllWeight();
 	double singleWeight;

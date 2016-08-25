@@ -6,7 +6,7 @@
 
 extern std::vector<double> sToDemand;
 
-static bulkPool pool;
+extern bulkPool pool;
 
 const int M = 4;
 

@@ -4,14 +4,19 @@
  */
 void bulkBackPressure::handle()
 {
-	vector<bulkAgent*>::iterator iter = _agents.begin();
-	
-	for (; iter != _agents.end(); iter++) {
-		(*iter)->reallocAll();
-		(*iter)->send();
+	vector<bulkAgent*>::iterator aIter = _agents.begin();
+	vector<bulkAgent*>::iterator vIter = _vAgents.begin();
+	inputPackets();
+	for (; vIter != _vAgents.end(); vIter++) {
+		(*vIter)->send();
 	}
-	for (iter = _agents.begin(); iter != _agents.end(); iter++) {
-		(*iter)->recv();
+	cout<<"OK"<<endl;
+	for (; aIter != _agents.end(); aIter++) {
+		(*aIter)->send();
+	}
+	for (aIter = _agents.begin(); aIter != _agents.end(); aIter++) {
+		(*aIter)->recv();
+		(*aIter)->reallocAll();
 	}
 }
 
@@ -32,15 +37,15 @@ void bulkBackPressure::_initAgents()
  */
 void bulkBackPressure::_initVirtualAgents()
 {
-	map<int, bulkNode>::iterator mIter = sourceList_->begin();
-	for (; mIter != sourceList_->end(); mIter++) {
+	map<int, bulkNode*>::iterator mIter = sourceList_.begin();
+	for (; mIter != sourceList_.end(); mIter++) {
 		bulkNode* vNode = new bulkNode(mIter->first);
 		bulkLink* vLink = new bulkLink(mIter->first, mIter->first);
 		bulkAgent* vAgent = new bulkAgent(mIter->first, *vNode);
 		vAgent->fake_ = true;
 		vAgent->addVirtualInputLink(vLink);
 		_vAgents.push_back(vAgent);
-		nList_[mIter->first].addInputLink(vLink);
+		(mIter->second)->addInputLink(vLink);
 	}
 }
 
@@ -74,13 +79,13 @@ void bulkBackPressure::_inputPackets(bulkAgent* vAgent, int sId)
  */
 void bulkBackPressure::inputPackets() 
 {
-	vector<bulkAgent*>::iterator bIter = _vAgents.begin(); 
-	for (; bIter != _vAgents.end(); bIter++) {
-		int id = (*bIter)->getAId();
-		bulkNode node = (*sourceList_)[id];
+	vector<bulkAgent*>::iterator vIter = _vAgents.begin(); 
+	for (; vIter != _vAgents.end(); vIter++) {
+		int id = (*vIter)->getAId();
+		bulkNode node = *(sourceList_[id]);
 		set<int>::iterator sIter = node.originalIds_.begin();
 		for (; sIter != node.originalIds_.end(); sIter++) {
-			_inputPackets(*bIter, *sIter);
+			_inputPackets(*vIter, *sIter);
 		}
 	}
 }

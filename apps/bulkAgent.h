@@ -29,7 +29,7 @@ class bulkAgent:public Agent
 				vector<int> temp(MAXSESSION + 1);
 				_requestBuf.push_back(temp);
 			}
-			setSendBuf(_node.getOutputNum() + 1); 
+			setSendBuf(_node.getOutputNum()); 
 			setRecvBuf(_node.getInputNum() + 1);
 			fake_ = false;
 		}

@@ -33,8 +33,6 @@ void bulkNetwork::handleOverException(bulkException e) const
  */
 bulkNetwork::bulkNetwork(Graph* graph):nSource_(0), nSink_(0)
 {
-	sourceList_ = new map<int, bulkNode>;
-	sinkList_ = new map<int, bulkNode>;
 	if (graph != NULL) {
 		topology_ = graph;
 		init();
@@ -51,7 +49,7 @@ void bulkNetwork::init()
 	if (topology_ != NULL) {
 		int n = topology_->getVertices();
 		GraphNode* aList = topology_->getList();
-		for (int i  = 0; i < n + 1; i++) {
+		for (int i  = 1; i < n + 1; i++) {
 			bulkNode* pNode = new bulkNode(aList[i]);
 			slist<GraphEdge>* edge = aList[i].getEdge();
 			slist<GraphEdge>::iterator iter = edge->begin();
@@ -84,7 +82,7 @@ bulkNetwork& bulkNetwork::setSourceNode(int id, int sId)
 		check(id, 1, n + 1);
 		check(sId, 1, MAXSESSION + 1);
 		nList_[id].setOriginal(sId);
-		sourceList_->insert(pair<int, bulkNode>(id, nList_[id]));
+		sourceList_.insert(pair<int, bulkNode*>(id, &nList_[id]));
 		nSource_++;
 		return *this;
 	} catch (bulkException e) {
@@ -107,7 +105,7 @@ bulkNetwork& bulkNetwork::setSinkNode(int id, int sId)
 		check(id, 1, n + 1);
 		check(id, 1, MAXSESSION + 1);
 		nList_[id].setTerminal(sId);
-		sinkList_->insert(pair<int, bulkNode>(id, nList_[id]));
+		sinkList_.insert(pair<int, bulkNode*>(id, &nList_[id]));
 		nSink_++;
 		return *this;
 	} catch (bulkException e) {
@@ -124,11 +122,11 @@ bulkNetwork& bulkNetwork::setSinkNode(int id, int sId)
  */
 bulkNode* bulkNetwork::getSourceNodeById(int id) const
 {
-	if (!sourceList_->empty()) {
-		map<int, bulkNode>::iterator iter;
-		iter = sourceList_->find(id);
-		if (iter != sourceList_->end()) {
-			return &iter->second;
+	if (!sourceList_.empty()) {
+		map<int, bulkNode*>::const_iterator iter;
+		iter = sourceList_.find(id);
+		if (iter != sourceList_.end()) {
+			return iter->second;
 		}
 	}
 	return NULL;
@@ -143,11 +141,11 @@ bulkNode* bulkNetwork::getSourceNodeById(int id) const
  */
 bulkNode* bulkNetwork::getSinkNodeById(int id) const
 {
-	if (!sinkList_->empty()) {
-		map<int, bulkNode>::iterator iter;
-		iter = sinkList_->find(id);
-		if (iter != sinkList_->end()) {
-			return &iter->second;
+	if (!sinkList_.empty()) {
+		map<int, bulkNode*>::const_iterator iter;
+		iter = sinkList_.find(id);
+		if (iter != sinkList_.end()) {
+			return iter->second;
 		}
 	}
 	return NULL;

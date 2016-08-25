@@ -8,7 +8,7 @@
  */
 int bulkBuffer::_check(int sId)
 {
-	if (sId < 1 || sId >= MAXSESSION) {
+	if (sId < 1 || sId > MAXSESSION) {
 		throw new bulkException("sId is overstep the boundary in buffers module");
 	}
 	return sId;
@@ -55,16 +55,16 @@ slist<bulkPacket>* bulkBuffer::pullPacketsFromBuf(int sId, int num)
 	int count = 0;
 	try {
 		sId = _check(sId);
+		while (!_buffers[sId]->empty() && count < num) {
+			bulkPacket& packet = _buffers[sId]->front();
+			pPackets->push_front(packet);
+			_buffers[sId]->pop_front();
+			count++;
+		}
+		return pPackets;
 	} catch (bulkException e) {
 		_handleOverException(e);
 	}
-	while (!_buffers[sId]->empty() && count < num) {
-		bulkPacket& packet = _buffers[sId]->front();
-		pPackets->push_front(packet);
-		_buffers[sId]->pop_front();
-		count++;
-	}
-	return pPackets;
 }
 
 /**

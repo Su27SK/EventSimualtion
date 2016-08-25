@@ -1,10 +1,10 @@
-#ifndef	CONFIG_H_
-#define	CONFIG_H_
-#define MAXSESSION 20
+#ifndef	_CONFIG_H_
+#define	_CONFIG_H_
+#define MAXSESSION 5
 #include <vector>
 #include "bulkPool.h"
 
-static std::vector<double> sToDemand(MAXSESSION + 1);
+extern std::vector<double> sToDemand;
 
 static bulkPool pool;
 

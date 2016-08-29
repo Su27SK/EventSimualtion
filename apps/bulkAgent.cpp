@@ -98,7 +98,7 @@ void bulkAgent::sendFromAgent(bulkLink& link)
 slist<bulkPacket>* bulkAgent::getStore(int sId)
 {
 	vector<bulkBuffer>::iterator iter;
-	slist<bulkPacket>* sum = NULL;
+	slist<bulkPacket>* sum = new slist<bulkPacket>;
 	int tag = OUT; 
 	vector<bulkBuffer>* pBuf = &_sendbuf;
 	while (tag != DEFAULT) {
@@ -149,7 +149,7 @@ double bulkAgent::getAllWeight()
 int bulkAgent::reallocPackets(int sId)
 {
 	slist<bulkPacket>* qsv = getStore(sId);
-	if (qsv == NULL) {
+	if (qsv->empty()) {
 		return 0;
 	}
 	double sum = qsv->size();
@@ -183,10 +183,12 @@ int bulkAgent::reallocPackets(int sId)
 				}
 				*bufSum = count;
 			}
-			pLink = _node.getInputLink();
-			tag++;
 		}
+		pLink = _node.getInputLink();
+		tag++;
 	}
+	qsv->~slist();
+	qsv = NULL;
 	return (int)sum;
 }
 
@@ -377,12 +379,13 @@ void bulkAgent::addVirtualOutputLink(bulkLink* link)
 }
 
 /**
- * @brief inputVirualNode 
+ * @brief inputVirtualNode 
  *
  * @param {bulkPacket&} packet
  * @param {interge} sId
  */
-void bulkAgent::inputVirualNode(bulkPacket& packet, int sId) 
+void bulkAgent::inputVirtualNode(bulkPacket& packet, int sId) 
 {
+	setSendBuf(1);
 	_sendbuf[0].pushPacketsToBuf(sId, packet);
 }

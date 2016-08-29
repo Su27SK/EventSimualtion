@@ -105,3 +105,4 @@ int bulkLink::diffPackets(int sId)
 {
 	return tailBufNum_[sId] - headBufNum_[sId];
 }
+

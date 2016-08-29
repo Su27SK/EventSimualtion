@@ -7,8 +7,8 @@ int main(int argc, char* argv[])
 {
 	Graph* graph = Graph::importGraph("../Bulk_Config_File/graph.txt");
 	bulkBackPressure* backPressure = new bulkBackPressure(graph);
-	backPressure->setSession(1, 4);
-	backPressure->setSession(2, 5);
+	backPressure->setSession(1, 1, 4, 4);
+	backPressure->setSession(2, 1, 4, 5);
 	backPressure->handle();
 	cout<<"Hello World"<<endl;
 	return 0;

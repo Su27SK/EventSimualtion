@@ -5,18 +5,16 @@
 void bulkBackPressure::handle()
 {
 	vector<bulkAgent*>::iterator aIter = _agents.begin();
-	vector<bulkAgent*>::iterator vIter = _vAgents.begin();
 	inputPackets();
-	for (; vIter != _vAgents.end(); vIter++) {
-		(*vIter)->send();
+	for (int i = 0; i < _vAgents.size(); i++) {
+		_vAgents[i]->send();
 	}
-	cout<<"OK"<<endl;
-	for (; aIter != _agents.end(); aIter++) {
-		(*aIter)->send();
+	for (int i = 0; i < _agents.size(); i++) {
+		_agents[i]->send();
 	}
-	for (aIter = _agents.begin(); aIter != _agents.end(); aIter++) {
-		(*aIter)->recv();
-		(*aIter)->reallocAll();
+	for (int i = 0; i < _agents.size(); i++) {
+		_agents[i]->recv();
+		_agents[i]->reallocAll();
 	}
 }
 
@@ -43,7 +41,7 @@ void bulkBackPressure::_initVirtualAgents()
 		bulkLink* vLink = new bulkLink(mIter->first, mIter->first);
 		bulkAgent* vAgent = new bulkAgent(mIter->first, *vNode);
 		vAgent->fake_ = true;
-		vAgent->addVirtualInputLink(vLink);
+		vAgent->addVirtualOutputLink(vLink);
 		_vAgents.push_back(vAgent);
 		(mIter->second)->addInputLink(vLink);
 	}
@@ -58,14 +56,14 @@ void bulkBackPressure::_initVirtualAgents()
 void bulkBackPressure::_inputPackets(bulkAgent* vAgent, int sId)
 {
 	try {
-		check(sId, 1, MAXSESSION + 1);
+		check(sId, 1, MAXSESSION);
 		int m = sToDemand[sId];
 		if (m > 0) {
 			int nPacket = RandomGenerator::genPoissonInt(m);
 			int count = 0;
 			while (count < m) {
 				bulkPacket& packet = pool.getPacketsFromPool();
-				vAgent->inputVirualNode(packet, sId);
+				vAgent->inputVirtualNode(packet, sId);
 				count++;
 			}
 		}
@@ -79,6 +77,7 @@ void bulkBackPressure::_inputPackets(bulkAgent* vAgent, int sId)
  */
 void bulkBackPressure::inputPackets() 
 {
+	_initVirtualAgents();
 	vector<bulkAgent*>::iterator vIter = _vAgents.begin(); 
 	for (; vIter != _vAgents.end(); vIter++) {
 		int id = (*vIter)->getAId();
@@ -94,18 +93,22 @@ void bulkBackPressure::inputPackets()
  * @brief setSession 
  *
  * @param {interge} sId
+ * @param {interge} sourceId
+ * @param {interge} sinkId
  * @param {double} demand
  *
  * @return {bulkBackPressure}
  */
-bulkBackPressure& bulkBackPressure::setSession(int sId, double demand)
+bulkBackPressure& bulkBackPressure::setSession(int sId, int sourceId, int sinkId, double demand)
 {
 	try {
-		check(sId, 1, MAXSESSION + 1);
+		check(sId, 1, MAXSESSION);
 		if (demand < 0) {
 			demand = 0;
 		}
 		sToDemand[sId] = demand;
+		setSourceNode(sourceId, sId);
+		setSinkNode(sinkId, sId);
 		return *this;
 	}
 	catch (bulkException e) {

@@ -15,11 +15,11 @@ class bulkBackPressure:public bulkNetwork
 	public:
 		bulkBackPressure():bulkNetwork() {}
 		bulkBackPressure(Graph* graph): bulkNetwork(graph) {
-			_initVirtualAgents();
+			RandomGenerator::init(time(NULL));
 			_initAgents();
 		}
 		void inputPackets();
-		bulkBackPressure& setSession(int sId, double demand);
+		bulkBackPressure& setSession(int sId, int sourceId, int sinkId, double demand);
 		virtual void handle();
 };
 #endif

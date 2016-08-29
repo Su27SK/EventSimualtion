@@ -79,10 +79,11 @@ bulkNetwork& bulkNetwork::setSourceNode(int id, int sId)
 {
 	try {
 		int n = topology_->getVertices();
-		check(id, 1, n + 1);
-		check(sId, 1, MAXSESSION + 1);
-		nList_[id].setOriginal(sId);
-		sourceList_.insert(pair<int, bulkNode*>(id, &nList_[id]));
+		check(id, 1, n);
+		check(sId, 1, MAXSESSION);
+		int indexId = id - 1;
+		nList_[indexId].setOriginal(sId);
+		sourceList_.insert(pair<int, bulkNode*>(id, &nList_[indexId]));
 		nSource_++;
 		return *this;
 	} catch (bulkException e) {
@@ -102,10 +103,11 @@ bulkNetwork& bulkNetwork::setSinkNode(int id, int sId)
 {
 	try {
 		int n = topology_->getVertices();
-		check(id, 1, n + 1);
-		check(id, 1, MAXSESSION + 1);
-		nList_[id].setTerminal(sId);
-		sinkList_.insert(pair<int, bulkNode*>(id, &nList_[id]));
+		check(id, 1, n);
+		check(sId, 1, MAXSESSION);
+		int indexId = id - 1;
+		nList_[indexId].setTerminal(sId);
+		sinkList_.insert(pair<int, bulkNode*>(id, &nList_[indexId]));
 		nSink_++;
 		return *this;
 	} catch (bulkException e) {
@@ -162,7 +164,8 @@ const bulkNode& bulkNetwork::getNodeById(int id) const
 {
 	try {
 		int n = topology_->getVertices();
-		check(id, 1, n + 1);
+		check(id, 1, n);
+		id--;
 		return nList_[id];
 	} catch (bulkException e) {
 		handleOverException(e);

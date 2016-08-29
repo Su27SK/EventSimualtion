@@ -19,6 +19,8 @@ class bulkAgent:public Agent
 		vector<vector<int> > _requestBuf;     //每条发送链路上各个session需要发送的数据量
 		double _computeS(map<double, int>& sorted, bulkLink link, double capacity);
 		int _aId;
+		bool _hasVInputLink;
+		bool _hasVOutputLink;
 	public:
 		bool fake_; //判断是否是伪Agent;
 		bulkAgent(int aId, bulkNode node):Agent()
@@ -31,6 +33,7 @@ class bulkAgent:public Agent
 			}
 			setSendBuf(_node.getOutputNum()); 
 			setRecvBuf(_node.getInputNum() + 1);
+			_hasVInputLink = _hasVOutputLink = false;
 			fake_ = false;
 		}
 		virtual bool recv();
@@ -41,7 +44,7 @@ class bulkAgent:public Agent
 		void sendFromAgent(bulkLink& link);
 		void addVirtualInputLink(bulkLink* link);
 		void addVirtualOutputLink(bulkLink* link);
-		void inputVirualNode(bulkPacket& packet, int sId);
+		void inputVirtualNode(bulkPacket& packet, int sId);
 		slist<bulkPacket>* getStore(int sId);
 		double getAllWeight();
 		int reallocPackets(int sId);

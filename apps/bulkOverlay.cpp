@@ -6,7 +6,7 @@
  */
 bulkOverlay& bulkOverlay::join(bulkOverlayAgent& v)
 {
-	_oAgents.push_back(&v);
+	_agents.push_back(&v);
 	return *this;
 }
 
@@ -17,10 +17,10 @@ bulkOverlay& bulkOverlay::join(bulkOverlayAgent& v)
  */
 bulkOverlay& bulkOverlay::leave(bulkOverlayAgent& v)
 {
-	vector<bulkOveralyAgent*>::iterator iter = _oAgents.begin();
-	for (; iter != _oAgents.end();) {
+	vector<bulkOveralyAgent*>::iterator iter = _agents.begin();
+	for (; iter != _agents.end();) {
 		if ((*iter)->getOverlayId() == v.getOverlayId()) {
-			iter = _oAgents.erase(iter);
+			iter = _agents.erase(iter);
 		} else {
 			iter++;
 		}
@@ -33,7 +33,10 @@ bulkOverlay& bulkOverlay::leave(bulkOverlayAgent& v)
  */
 void bulkOverlay::initEdgenecks()
 {
-	
+	vector<bulkOveralyAgent*>::iterator iter = _agents.begin();
+	for (; iter != _agents.end();) {
+		
+	}
 }
 
 /**
@@ -43,10 +46,3 @@ void bulkOverlay::initNetBottlenecks()
 {
 	
 }
-
-
-
-
-
-
-

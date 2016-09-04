@@ -5,7 +5,9 @@
 class bulkOverlay: public bulkNetwork
 {
 	private:
-		vector<bulkOverlayAgent*> _oAgents;
+		vector<bulkOverlayAgent*> _agents;
+		vector<bulkOverlayAgent*> _edgeVAgents;
+		vector<bulkOverlayAgent*> _capacityVAgents;
 	public:
 		bulkOverlay():bulkNetwork() {
 			RandomGenerator::init(time(NULL));

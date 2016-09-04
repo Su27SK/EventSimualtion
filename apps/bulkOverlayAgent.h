@@ -4,23 +4,23 @@
 class bulkOverlayAgent:public Agent
 {
 	private:
-		bulkNode  _node;
+		bulkNode _node;
 		int _time;
 		int _vId;
-		double _uplinkBottleneck;
-		double _downlinkBottleneck;
-		double _storage;
-		double _backboneneck;
 	public:
+		double _storage;
 		bulkOverlayAgent(int vId, bulkNode node):Agent() 
 	    {
 			_vId = vId;
 			_node = node;
-			_uplinkBottleneck = _downlinkBottleneck = _storage = _backboneneck = 0.0;
+			_storage = 0.0;
+			_time = 1;
 		}
 		double getPredictedVolume(int time);
 		void transmission();
 		void schedule();
 		int getOverlayId();
+		double getPhysicalUplink(int nextId);
+		double getPhysicalDownlink(int nextId);
 };
 #endif

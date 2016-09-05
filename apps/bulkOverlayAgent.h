@@ -4,23 +4,28 @@
 class bulkOverlayAgent:public Agent
 {
 	private:
+		enum {MINUS = 1, PLUS = 2, CAP = 3, DEFAULT = 4};
 		bulkNode _node;
 		int _time;
-		int _vId;
+		int _oId;
 	public:
-		double _storage;
-		bulkOverlayAgent(int vId, bulkNode node):Agent() 
+		double storage_;
+		int type_;
+		bulkOverlayAgent(int oId, bulkNode node):_oId(oId), _node(node), Agent() 
 	    {
-			_vId = vId;
-			_node = node;
-			_storage = 0.0;
-			_time = 1;
+			storage_ = 0.0;
+			type_ = DEFAULT;
+			_time = -1;
 		}
-		double getPredictedVolume(int time);
+		double predictedVolume(int time);
 		void transmission();
 		void schedule();
 		int getOverlayId();
-		double getPhysicalUplink(int nextId);
-		double getPhysicalDownlink(int nextId);
+		virtual bool recv();
+		virtual bool send();
+		bulkOverlayAgent& setOverlayId(int id);
+		slist<bulkOverlayAgent*>* initDownEdgenecks();
+		slist<bulkOverlayAgent*>* initUpEdgenecks();
+		void initBottlenecks();
 };
 #endif

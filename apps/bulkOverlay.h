@@ -1,18 +1,16 @@
 #ifndef _BULKOVERLAY_H_
 #define _BULKOVERLAY_H_
+#include "flowNetwork.h"
 #include "bulkOverlayAgent.h"
-#include "bulkNetwork.h"
-class bulkOverlay: public bulkNetwork
+class bulkOverlay:public flowNetwork 
 {
 	private:
-		vector<bulkOverlayAgent*> _agents;
-		vector<bulkOverlayAgent*> _edgeVAgents;
-		vector<bulkOverlayAgent*> _capacityVAgents;
+		vector<bulkOverlayAgent*> _oAgents;
 	public:
-		bulkOverlay():bulkNetwork() {
+		bulkOverlay():flowNetwork() {
 			RandomGenerator::init(time(NULL));
 		}
-		bulkOverlay(Graph* graph): bulkNetwork(graph) {
+		bulkOverlay(Graph* graph): flowNetwork(graph) {
 			RandomGenerator::init(time(NULL));
 		}
 		bulkOverlay& join(bulkOverlayAgent& v);

@@ -11,7 +11,6 @@ class flowNetwork
 	public:
 		flowNetwork() {
 			_topology = NULL;
-			_initAdj();
 		}
 		flowNetwork(Graph* graph): _topology(graph) {
 			_initAdj();

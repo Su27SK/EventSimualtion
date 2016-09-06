@@ -49,3 +49,8 @@ void flowNetwork::addEdge(bulkFlow* e)
 	_adj[v]->push_front(e);
 }
 
+int flowNetwork::getVertices()
+{
+	return _adj.size() - 1;
+}
+

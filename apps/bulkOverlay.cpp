@@ -2,30 +2,40 @@
 /**
  * @brief join 
  * 加入Overlay
- * @param {bulkOverlayAgent} v
+ * @param {bulkNode} v
+ *
+ * @return {bulkOverlay}
  */
-bulkOverlay& bulkOverlay::join(bulkOverlayAgent& v)
+bulkOverlay& bulkOverlay::join(bulkNode& v)
 {
-	_oAgents.push_back(&v);
 	return *this;
 }
 
 /**
  * @brief leave 
  * 离开Overlay
- * @param {bulkOveralyAgent} v
+ * @param {bulkNode} v
+ *
+ * @return {bulkOverlay}
  */
-bulkOverlay& bulkOverlay::leave(bulkOverlayAgent& v)
+bulkOverlay& bulkOverlay::leave(bulkNode& v)
 {
-	vector<bulkOveralyAgent*>::iterator iter = _oAgents.begin();
-	for (; iter != _oAgents.end();) {
-		if ((*iter)->getOverlayId() == v.getOverlayId()) {
-			iter = _oAgents.erase(iter);
-		} else {
-			iter++;
-		}
-	}
 	return *this;
+}
+
+/**
+ * @brief scheduling 
+ *
+ * @param {interge} v
+ * @param {interge} u
+ * @return {double}
+ */
+double bulkOverlay::scheduling(int v, int u)
+{
+	if ( ) {
+		fordFulersion::FordFulersion(*this, v, u);
+		_flowFromV = fordFulersion::getValue();
+	}
 }
 
 /**
@@ -33,19 +43,7 @@ bulkOverlay& bulkOverlay::leave(bulkOverlayAgent& v)
  */
 void bulkOverlay::initEdgenecks()
 {
-	vector<bulkOveralyAgent*>::iterator vIter = _oAgents.begin();
-	for (; vIter != _oAgents.end();) {
-		int i = 1;
-		slist<bulkOverlayAgent*>* pOverlayAgents = (*vIter)->initDownEdgenecks();
-		while (i <= 2) {
-			while (!pOverlayAgents->empty()) {
-				bulkOverlayAgent* pAgent = pOverlayAgents->pop_front();
-				_oAgents.push(pAgent);
-			}
-			pOverlayAgents = (*vIter)->initUpEdgenecks();
-			i++;
-		}
-	}
+	
 }
 
 /**
@@ -53,5 +51,5 @@ void bulkOverlay::initEdgenecks()
  */
 void bulkOverlay::initNetBottlenecks()
 {
-
+	
 }

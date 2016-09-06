@@ -39,6 +39,9 @@ bool fordFulkersion::_hasAugmentingPath(bulkOverlay G, int s, int t)
  */
 void fordFulkersion::FordFulkersion(bulkOverlay G, int s, int t)
 {
+	int v = G.getVertices();
+	_marked.resize(v + 1);
+	_edgeTo.resize(v + 1);
 	_value = 0.0;
 	while (_hasAugmentingPath(G, s, t)) {
 		double bottle = MAX;
@@ -50,6 +53,16 @@ void fordFulkersion::FordFulkersion(bulkOverlay G, int s, int t)
 		}
 		_value += bottle;
 	}
+}
+
+/**
+ * @brief getEdgeTo 
+ *
+ * @return {vector<bulkFlow>}
+ */
+vector<bulkFlow> fordFulkersion::getEdgeTo()
+{
+	return _edgeTo;
 }
 
 /**

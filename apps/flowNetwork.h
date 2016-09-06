@@ -4,7 +4,7 @@
 #include "bulkFlow.h"
 class flowNetwork
 {
-	private:
+	protected:
 		vector<slist<bulkFlow*>* > _adj;
 		Graph* _topology;
 		void _initAdj();
@@ -17,5 +17,6 @@ class flowNetwork
 		}
 		slist<bulkFlow*>* getAdj(int v);
 		void addEdge(bulkFlow* e);
+		int getVertices();
 };
 #endif

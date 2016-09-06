@@ -4,21 +4,19 @@
 #include <queue>
 #include <algorithm>
 #include "config.h"
-#include "bulkOverlay.h"
+#include "flowNetwork.h"
 class fordFulkersion
 {
 	private:
 		static vector<bool> _marked;
 		static vector<bulkFlow> _edgeTo;
 		static double _value = 0.0;
-		static bool _hasAugmentingPath(bulkOverlay G, int s, int t);
+		static bool _hasAugmentingPath(flowNetwork G, int s, int t);
 	public:
-		fordFulkersion(int v) {
-			_marked.resize(v + 1);
-			_edgeTo.resize(v + 1);
-		}
-		static void FordFulkersion(bulkOverlay G, int s, int t);
+		fordFulkersion() {}
+		static void FordFulkersion(flowNetwork G, int s, int t);
 		static double getValue();
+		static vector<bulkFlow> getEdgeTo();
 		static bool intCut(int v);
 };
 #endif

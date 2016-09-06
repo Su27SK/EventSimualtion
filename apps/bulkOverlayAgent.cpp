@@ -1,33 +1,84 @@
 #include "bulkOverlayAgent.h"
 
 /**
- * @brief getPredictedVolume 
+ * @brief recv 
+ *
+ * @return {boolean}
+ */
+bool bulkOverlayAgent::recv()
+{
+	return true;
+}
+
+/**
+ * @brief send 
+ *
+ * @return {boolean}
+ */
+bool bulkOverlayAgent::send()
+{
+	return true;
+}
+
+/**
+ * @brief send 
+ * 
+ * @param {interge} v 起点
+ * @param {interge} u 终点
+ * @param {interge} F 发送大小
+ */
+void bulkOverlayAgent::send(int v, int u, int F)
+{
+	if (_updated) {
+		bulkOverlay::scheduling(v, u);
+		_updated = false;
+	} else {
+		
+	}
+}
+
+/**
+ * @brief getUpdated 
+ *
+ * @return {boolean}
+ */
+bool bulkOverlayAgent::getUpdated()
+{
+	return _updated;
+}
+
+/**
+ * @brief setUpdated 
+ *
+ * @return {bulkOverlay}
+ */
+bulkOverlayAgent& bulkOverlayAgent::setUpdated()
+{
+	_updated = true;
+	return *this;
+}
+
+/**
+ * @brief predictedVolume 
  * 获得预测函数
  * @param {interge} time
  *
- * @return 
+ * @return {double}
  */
-double bulkOverlayAgent::getPredictedVolume(int time)
+double bulkOverlayAgent::predictedVolume(int time)
 {
-	
+	return 0;
 }
 
 /**
  * @brief transmission 
  * 传输函数
  */
-void bulkOverlayAgent::transmission()
+void bulkOverlayAgent::transmission(int amount)
 {
-	
-}
-
-/**
- * @brief schedule 
- * 调度函数
- */
-void bulkOverlayAgent::schedule()
-{
-	
+	if (!_node.getTerminal()) {
+		_storage -= amount;
+	}
 }
 
 /**
@@ -39,56 +90,3 @@ int bulkOverlayAgent::getOverlayId()
 {
 	return _vId;
 }
-
-/**
- * @brief initDownEdgenecks 
- * init Down edge necks
- * @return {slist<bulkOverlayAgent*>}
- */
-slist<bulkOverlayAgent*>* bulkOverlayAgent::initDownEdgenecks()
-{
-	slist<bulkOverlayAgent*>* pOverlayAgents = new slsit<bulkOverlayAgent*>(0);
-	slist<bulkLink*>* input = _node.getInputLink();
-	slist<bulkLink*>::iterator iter = input->begin();
-	if (!_node.getOriginal()) {
-		for (; iter != input->end(); iter++) {
-			int nodeId = _node.getNodeId();
-			bulkNode* pNode = new bulkNode(nodeId);	
-			bulkLink* downLink = new bulkLink(nodeId, nodeId);
-			downLink->setCapacity((*iter)->getCapacity());
-			pNode->addOutputLink(downLink);
-			bulkOverlayAgent* downAgent = new bulkOverlayAgent(-1, *pNode);
-			downAgent->type_ = MINUS;
-			pOverlayAgents.push_back(downAgent);
-			input->erase(iter);
-		}
-	}
-	return pOverlayAgents;
-}
-
-/**
- * @brief initUpEdgenecks 
- * init up edge necks
- * @return {slist<bulkOverlayAgent*>}
- */
-slist<bulkOverlayAgent*>* bulkOverlayAgent::initUpEdgenecks()
-{
-	slist<bulkOverlayAgent*>* pOverlayAgents = new slsit<bulkOverlayAgent*>(0);
-	slist<bulkLink*>* output = _node.getOutputLink();
-	slist<bulkLink*>::iterator iter = output->begin();
-	if (!_node.getTerminal()) {
-		for (; iter != output->end(); iter++) {
-			int nodeId = _node.getNodeId();
-			bulkNode* pNode = new bulkNode(nodeId);	
-			bulkLink* downLink = new bulkLink(nodeId, nodeId);
-			downLink->setCapacity((*iter)->getCapacity());
-			pNode->addInputLink(downLink);
-			bulkOverlayAgent* upAgent = new bulkOverlayAgent(-1, *pNode);
-			upAgent->type_ = PLUS;
-			pOverlayAgents.push_back(upAgent);
-			output->erase(iter);
-		}
-	}
-	return pOverlayAgents;
-}
-

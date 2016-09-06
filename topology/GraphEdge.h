@@ -2,7 +2,7 @@
 #define _GRAPHEDGE_H_
 class GraphEdge
 {
-	private:
+	protected:
 		int _v1;		   //node id of the origin
 		int _v2;		   //node id of the end
 		double _weight;	   //(数学期望)

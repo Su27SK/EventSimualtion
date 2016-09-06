@@ -11,7 +11,7 @@ void bulkLink::_init()
 }
 
 /**
- * @brief getCapacity 
+ * @brief getVaryCapacity 
  * 获得时刻改变的链路带宽
  * @return {double}
  */
@@ -80,6 +80,9 @@ int bulkLink::getHeadId()
 	return _headId;
 }
 
+/**
+ * @brief transfer 
+ */
 void bulkLink::transfer()
 {
 	for (int i = 1; i <= MAXSESSION; i++) {

@@ -1,13 +1,15 @@
 #ifndef _BULKNETSTITCHER_H_
 #define _BULKNETSTITCHER_H_
 #include "TimerHandler.h"
+#include "bulkOverlay.h"
+#include "Application.h"
 class bulkNetStitcher;
 
 class bulkNetStitcherTimer: public TimerHandler
 {
 	public:
 		bulkNetStitcherTimer(bulkNetStitcher* t):TimerHandler(), t_(t) {}
-		inline virtual void expire(Event*);
+		virtual void expire(Event*);
 	protected:
 		bulkNetStitcher* t_;
 };
@@ -15,13 +17,12 @@ class bulkNetStitcherTimer: public TimerHandler
 class bulkNetStitcher: public Application
 {
 	public:
-		bulkNetStitcher();
+		bulkNetStitcher():Application(), running_(0), timer_(this) {}
 		void timeout();
 	protected:
 		void start();
 		void stop();
-		inline double next();
-
+		double next();
 		double interval_;
 		int running_;
 		bulkNetStitcherTimer timer_;

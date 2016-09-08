@@ -2,13 +2,13 @@
 /**
  * @brief _hasAugmentingPath 
  * 是否还存在增广路径
- * @param {bulkOverlay} G
+ * @param {flowNetwork} G
  * @param {interge} s
  * @param {interge} t
  *
  * @return {boolean}
  */
-bool fordFulkersion::_hasAugmentingPath(bulkOverlay G, int s, int t)
+bool fordFulkersion::_hasAugmentingPath(flowNetwork G, int s, int t)
 {
 	queue<int> q;
 	q.push(s);
@@ -33,11 +33,11 @@ bool fordFulkersion::_hasAugmentingPath(bulkOverlay G, int s, int t)
 /**
  * @brief FordFulkersion 
  * 
- * @param {bulkOverlay} G
+ * @param {flowNetwork} G
  * @param {interge} s
  * @param {interge} t
  */
-void fordFulkersion::FordFulkersion(bulkOverlay G, int s, int t)
+void fordFulkersion::FordFulkersion(flowNetwork G, int s, int t)
 {
 	int v = G.getVertices();
 	_marked.resize(v + 1);

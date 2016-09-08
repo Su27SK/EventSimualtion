@@ -1,5 +1,4 @@
 #include "bulkOverlayAgent.h"
-
 /**
  * @brief recv 
  *
@@ -7,6 +6,7 @@
  */
 bool bulkOverlayAgent::recv()
 {
+	_storage -= _downlink * time_;
 	return true;
 }
 
@@ -17,68 +17,8 @@ bool bulkOverlayAgent::recv()
  */
 bool bulkOverlayAgent::send()
 {
+	_storage += _uplink * time_;
 	return true;
-}
-
-/**
- * @brief send 
- * 
- * @param {interge} v 起点
- * @param {interge} u 终点
- * @param {interge} F 发送大小
- */
-void bulkOverlayAgent::send(int v, int u, int F)
-{
-	if (_updated) {
-		bulkOverlay::scheduling(v, u);
-		_updated = false;
-	} else {
-		
-	}
-}
-
-/**
- * @brief getUpdated 
- *
- * @return {boolean}
- */
-bool bulkOverlayAgent::getUpdated()
-{
-	return _updated;
-}
-
-/**
- * @brief setUpdated 
- *
- * @return {bulkOverlay}
- */
-bulkOverlayAgent& bulkOverlayAgent::setUpdated()
-{
-	_updated = true;
-	return *this;
-}
-
-/**
- * @brief predictedVolume 
- * 获得预测函数
- * @param {interge} time
- *
- * @return {double}
- */
-double bulkOverlayAgent::predictedVolume(int time)
-{
-	return 0;
-}
-
-/**
- * @brief transmission 
- * 传输函数
- */
-void bulkOverlayAgent::transmission(int amount)
-{
-	if (!_node.getTerminal()) {
-		_storage -= amount;
-	}
 }
 
 /**
@@ -88,5 +28,65 @@ void bulkOverlayAgent::transmission(int amount)
  */
 int bulkOverlayAgent::getOverlayId()
 {
-	return _vId;
+	return _oId;
+}
+
+/**
+ * @brief setOverlayId 
+ *
+ * @param {interge} id
+ *
+ * @return {bulkOverlayAgent}
+ */
+bulkOverlayAgent& bulkOverlayAgent::setOverlayId(int id)
+{
+	_oId = id;
+	return *this;
+}
+
+/**
+ * @brief getStorage 
+ *
+ * @return {double}
+ */
+double bulkOverlayAgent::getStorage()
+{
+	return _storage;
+}
+
+/**
+ * @brief setStorage 
+ *
+ * @param {interge} nbytes
+ *
+ * @return {bulkOverlayAgent}
+ */
+bulkOverlayAgent& bulkOverlayAgent::setStorage(int nbytes)
+{
+	_storage = nbytes;
+	return *this;
+}
+
+/**
+ * @brief setUplink 
+ *
+ * @param {double} flow
+ *
+ * @return {bulkOverlayAgent}
+ */
+bulkOverlayAgent& bulkOverlayAgent::setUplink(double flow)
+{
+	_uplink = flow;
+}
+
+/**
+ * @brief setUplink 
+ *
+ * @param {double} flow
+ *
+ * @return {bulkOverlayAgent}
+ */
+bulkOverlayAgent& bulkOverlayAgent::setDownlink(double flow)
+{
+	_downlink = flow;
 }

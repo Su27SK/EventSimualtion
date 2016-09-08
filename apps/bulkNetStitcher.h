@@ -23,7 +23,6 @@ class bulkNetStitcher: public Application
 		void start();
 		void stop();
 		double next();
-		double interval_;
 		int running_;
 		bulkNetStitcherTimer timer_;
 };

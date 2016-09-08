@@ -1,24 +1,19 @@
 #ifndef _BULKOVERLAY_H_
 #define _BULKOVERLAY_H_
-#include "fordFulersion.h"
+#include "fordFulkersion.h"
 #include "flowNetwork.h"
-#include "bulkOverlayAgent.h"
 class bulkOverlay:public flowNetwork 
 {
 	private:
-		static int _time = 0;
-		static double _flowFromV = 0.0;
+		vector<bulkFlow> _routeToOId;
+		double _flow;
 	public:
 		bulkOverlay():flowNetwork() {
-			RandomGenerator::init(time(NULL));
+			cout<<"Default BulkOverlay Network"<<endl;
 		}
-		bulkOverlay(Graph* graph): flowNetwork(graph) {
-			RandomGenerator::init(time(NULL));
-		}
-		bulkOverlay& join(bulkNode& v);
-		bulkOverlay& leave(bulkNode& v);
-		double static scheduling(int v, int u);
-		void initEdgenecks();
+		bulkOverlay(Graph* graph): flowNetwork(graph) {}
+		bool scheduling(int v, int u);
+		bool updating();
 		void initNetBottlenecks();
 };
 #endif

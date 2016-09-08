@@ -43,8 +43,8 @@ slist<bulkFlow*>* flowNetwork::getAdj(int v)
  */
 void flowNetwork::addEdge(bulkFlow* e)
 {
-	int v = e.getGraphEdgeSource();
-	int w = e.getGraphEdgeSink();
+	int v = e->getGraphEdgeSource();
+	int w = e->getGraphEdgeSink();
 	_adj[v]->push_front(e);
 	_adj[v]->push_front(e);
 }

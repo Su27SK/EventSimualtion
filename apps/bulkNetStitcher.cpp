@@ -28,6 +28,7 @@ void bulkNetStitcher::stop()
 void bulkNetStitcher::timeout()
 {
 	if (running_) {
+		cout<<"I Love You!"<<endl;
 		double t = next();
 		timer_.resched(t);
 	}

@@ -2,6 +2,10 @@
 #define _FLOWNETWORK_H_
 #include "Graph.h"
 #include "bulkFlow.h"
+#include <vector>
+#include <ext/slist>
+using namespace __gnu_cxx;
+using namespace std;
 class flowNetwork
 {
 	protected:

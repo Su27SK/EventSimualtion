@@ -19,7 +19,7 @@ class Event
 		double _time;
 		int _uid;
 		Event():_time(0), _uid(0) {
-			this->_prev = this;
+			this->_prev = NULL;
 			this->_next = NULL;
 		}
 };
@@ -63,14 +63,14 @@ class Scheduler
 class ListScheduler:public Scheduler
 {
 	public:
-		ListScheduler():_queue(0){}
+		ListScheduler():queue_(0){}
 		void cancel(Event*);
 		void insert(Event*);
 		bool empty();
 		Event* deque();
-		const Event* head() {return _queue;}
+		const Event* head() {return queue_;}
 		Event* lookup(int uid);
 	protected:
-		Event* _queue;
+		Event* queue_;
 };
 #endif

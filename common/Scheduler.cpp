@@ -1,5 +1,5 @@
 #include "Scheduler.h"
-Scheduler* Scheduler::_instance;
+Scheduler* Scheduler::_instance = new ListScheduler();
 int Scheduler::_uid = 1;
 Scheduler::Scheduler():_clock(SCHED_START), _halted(0) 
 {
@@ -24,8 +24,8 @@ void Scheduler::schedule(Handler* h, Event* e, double delay)
 				"  Don't Do that at time %f\n", _clock);
 		abort();
 	}
-
-	if (e->_uid <= 0) {
+	
+	if (e->_uid > 0) {
 		printf("Scheduler: Event UID not valid!\n\n");
 		abort();
 	}
@@ -43,7 +43,7 @@ void Scheduler::schedule(Handler* h, Event* e, double delay)
 	e->_uid = _uid++;
 	e->_handler = h;
 	double t = _clock + delay;
-
+	
 	e->_time = t;
 	insert(e);
 }
@@ -57,7 +57,6 @@ void Scheduler::run()
 	_instance = this;
 	Event* p;
 	
-
 	while (!_halted && (p = deque())) {
 		dispatch(p, p->_time);
 	}
@@ -127,20 +126,13 @@ void ListScheduler::insert(Event* e)
 {
 	double t = e->_time;
 	Event** p;
-	for (p = &_queue; *p != 0; p = &(*p)->_next) {
+	for (p = &queue_; *p != 0; p = &(*p)->_next) {
 		if (t < (*p)->_time) {
 			break;
 		}
 	}
-	if (empty()) {
-		_queue = e;
-	} else {
-		e->_next = *p;
-		Event* prev = (*p)->_prev;
-		prev->_next = e;
-		e->_prev = prev;
-		(*p)->_prev = e;
-	}
+	e->_next = *p;
+	*p = e;
 }
 
 /**
@@ -154,14 +146,12 @@ void ListScheduler::cancel(Event* e)
 	if (e->_uid <= 0) {
 		return ;
 	}
-	for (p = &_queue; *p != e; p = &(*p)->_next) {
+	for (p = &queue_; *p != e; p = &(*p)->_next) {
 		if (*p == 0) {
 			abort();
 		}
 	}
-	Event* prev = (*p)->_prev;
-	prev->_next = (*p)->_next;
-	(*p)->_next->_prev = prev;
+	*p = (*p)->_next;
 	e->_uid = -e->_uid;
 }
 
@@ -175,7 +165,7 @@ void ListScheduler::cancel(Event* e)
 Event* ListScheduler::lookup(int uid)
 {
 	Event* e;
-	for (e = _queue; e != 0; e = e->_next) {
+	for (e = queue_; e != 0; e = e->_next) {
 		if (e->_uid == uid) {
 			break;
 		}
@@ -190,11 +180,9 @@ Event* ListScheduler::lookup(int uid)
  */
 Event* ListScheduler::deque()
 {
-	Event* e = _queue;
+	Event* e = queue_;
 	if (e) {
-		_queue = e->_next;
-		e->_next->_prev = e->_next;
-		e->_next = e->_prev = NULL;
+		queue_ = e->_next; 
 	}
 	return (e);
 }
@@ -206,7 +194,7 @@ Event* ListScheduler::deque()
  */
 bool ListScheduler::empty()
 {
-	if (this->_queue == 0) {
+	if (this->queue_ == 0) {
 		return true;
 	} else {
 		return false;

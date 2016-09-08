@@ -5,7 +5,7 @@
  *
  * @return {double}
  */
-double bulkFlow::getFlow()
+double bulkFlow::getFlow() const
 {
 	return _flow;
 }
@@ -55,9 +55,9 @@ double bulkFlow::residualCapacityTo(int vertex)
 void bulkFlow::addResidualFlowTo(int vertex, double delta)
 {
 	if (vertex == _v1) {
-		flow -= delta;
+		_flow -= delta;
 	} else if (vertex == _v2) {
-		flow += delta;
+		_flow += delta;
 	} else {
 		throw new bulkException("bulkFlow addResidualFlowTo function inconsistent edge");
 	}

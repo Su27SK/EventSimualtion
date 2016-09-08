@@ -1,49 +1,35 @@
 #include "bulkOverlay.h"
 /**
- * @brief join 
- * 加入Overlay
- * @param {bulkNode} v
- *
- * @return {bulkOverlay}
- */
-bulkOverlay& bulkOverlay::join(bulkNode& v)
-{
-	return *this;
-}
-
-/**
- * @brief leave 
- * 离开Overlay
- * @param {bulkNode} v
- *
- * @return {bulkOverlay}
- */
-bulkOverlay& bulkOverlay::leave(bulkNode& v)
-{
-	return *this;
-}
-
-/**
  * @brief scheduling 
  *
  * @param {interge} v
  * @param {interge} u
- * @return {double}
+ * @return {boolean}
  */
-double bulkOverlay::scheduling(int v, int u)
+bool bulkOverlay::scheduling(int v, int u)
 {
-	if ( ) {
-		fordFulersion::FordFulersion(*this, v, u);
-		_flowFromV = fordFulersion::getValue();
-	}
+	fordFulkersion::FordFulkersion(*this, v, u);
+	_flow = fordFulkersion::getValue();
+	_routeToOId = fordFulkersion::getEdgeTo();
+	return true;
 }
 
 /**
- * @brief initEdgenecks
+ * @brief updating 
+ * 获得预测信息之后，更新每条边数据
+ * @return {boolean}
  */
-void bulkOverlay::initEdgenecks()
+bool bulkOverlay::updating()
 {
-	
+	slist<bulkFlow*>::iterator iter;
+	for (size_t i = 1; i < _agj.size(); i++) {
+		slist<bulkFlow*>* pFlow = _adj[i];
+		for (iter = pFlow->begin(); iter != pFlow->end(); iter++) {
+			int s = (*iter)->getGraphEdgeSource();
+			int v = (*iter)->getGraphEdgeSink();
+		}
+	}
+	return true;
 }
 
 /**

@@ -1,38 +1,32 @@
 #ifndef _BULKOVERLAYAGENT_H_
 #define _BULKOVERLAYAGENT_H_
-#include "bulkOverlay.h"
+#include "fordFulkersion.h"
+#include "agent.h"
+#include <vector>
+#include <ext/slist>
+using namespace __gnu_cxx;
+using namespace std;
 class bulkOverlayAgent:public Agent
 {
 	private:
-		enum {MINUS = 1, PLUS = 2, CAP = 3, DEFAULT = 4};
-		bulkNode _node;
-		double _uplink;
-		double _downlink;
-		double _storage;
-		int _time;
+		double _uplink;   //上传速率Gb/s
+		double _downlink; //下载速率Gb/s
+		double _storage;  //存储空间  
 		int _oId;
-		bool _updated;
 	public:
-		double demandFlow_;
-		double slist<vector<int> > timeSeries_;
-		int type_;
-		bulkOverlayAgent(int oId, bulkNode node):_oId(oId), _node(node), Agent() 
+		int time_;        //持续时间 s
+		bulkOverlayAgent(int oId):_oId(oId), Agent() 
 	    {
-			_uplink = _downlink = 0.0;
-			_storage = 0.0;
-			type_ = DEFAULT;
-			_time = -1;
-			_updated = false;
+			_uplink = _downlink = _storage = 0.0;
+			time_ = 0;
 		}
-		double predictedVolume(int time);
-		void transmission(int amount);
-		int getOverlayId();
 		virtual bool recv();
 		virtual bool send();
-		bool getUpdated();
-		void setUpdated();
-		void send(int v, int u, int F);
+		double getStorage();
+		int getOverlayId();
 		bulkOverlayAgent& setOverlayId(int id);
-		void initBottlenecks();
+		bulkOverlayAgent& setStorage(int nbytes);
+		bulkOverlayAgent& setUplink(double flow);
+		bulkOverlayAgent& setDownlink(double flow);
 };
 #endif

@@ -21,6 +21,14 @@ void flowNetwork::_initAdj()
 				addEdge(flow);
 			}
 		}
+		for (int i = 1; i < n + 1; i++) {
+			slist<bulkFlow*>::iterator iter = _adj[i]->begin();
+			int count = 0;
+			for (; count < _adj[i]->size() / 2; iter++) {
+				count++;
+			}
+			_adj[i]->erase(iter, _adj[i]->end());
+		}
 	}
 }
 
@@ -46,7 +54,7 @@ void flowNetwork::addEdge(bulkFlow* e)
 	int v = e->getGraphEdgeSource();
 	int w = e->getGraphEdgeSink();
 	_adj[v]->push_front(e);
-	_adj[v]->push_front(e);
+	//_adj[v]->push_front(e);
 }
 
 int flowNetwork::getVertices()

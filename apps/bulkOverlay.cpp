@@ -22,7 +22,7 @@ bool bulkOverlay::scheduling(int v, int u)
 bool bulkOverlay::updating()
 {
 	slist<bulkFlow*>::iterator iter;
-	for (size_t i = 1; i < _agj.size(); i++) {
+	for (size_t i = 1; i < _adj.size(); i++) {
 		slist<bulkFlow*>* pFlow = _adj[i];
 		for (iter = pFlow->begin(); iter != pFlow->end(); iter++) {
 			int s = (*iter)->getGraphEdgeSource();

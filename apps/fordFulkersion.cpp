@@ -1,4 +1,7 @@
 #include "fordFulkersion.h"
+vector<bool> fordFulkersion:: _marked;
+vector<bulkFlow> fordFulkersion::_edgeTo;
+double fordFulkersion::_value;
 /**
  * @brief _hasAugmentingPath 
  * 是否还存在增广路径

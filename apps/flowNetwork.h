@@ -8,10 +8,11 @@ using namespace __gnu_cxx;
 using namespace std;
 class flowNetwork
 {
+	private:
+		void _initAdj();
 	protected:
 		vector<slist<bulkFlow*>* > _adj;
 		Graph* _topology;
-		void _initAdj();
 	public:
 		flowNetwork() {
 			_topology = NULL;

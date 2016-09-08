@@ -45,8 +45,10 @@ class overlaySimulation:public bulkNetStitcher
 				int id = _agetns[i]->getOverlayId();
 				slist<bulkFlow*>* pFlow = _overlay.getAdj(id);
 				for (iter = pFlow->begin(); iter != pFlow->end(); iter++) {
-					
-					_agents[i]->setUplink();
+					int s = (*iter)->getGraphEdgeSource();
+					int v = (*iter)->getGraphEdgeSink();
+					_agents[s - 1]->setUplink((*iter)->getFlow());
+					_agents[v - 1]->setDownlink((*iter)->getFlow());
 				}
 			}
 		}

@@ -5,7 +5,7 @@
 class bulkOverlay:public flowNetwork 
 {
 	private:
-		vector<bulkFlow> _routeToOId;
+		bulkFlow* _routeToOId;
 		double _flow;
 	public:
 		bulkOverlay():flowNetwork() {

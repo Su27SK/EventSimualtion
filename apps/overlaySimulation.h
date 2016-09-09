@@ -7,69 +7,29 @@
 class overlaySimulation:public bulkNetStitcher
 {
 	private:
-		bulkOverlay _overlay;
+		bulkOverlay* _overlay;
 		vector<bulkOverlayAgent*> _agents;
 		int _s;   //source
 		int _v;   //sink
-		void _init() {
-			int n = overlay.getVertices();
-			for (int i = 1; i < n; i++) {
-				bulkOverlayAgent* pOverlayAgent = new bulkOverlayAgent(i);
-				_agents.push_back(pOverlayAgent);
-			}
-		}
+		void _init();
 	public:
-		overlaySimulation(bulkOverlay& overlay):bulkNetStitcher() {
+		overlaySimulation(bulkOverlay* overlay):bulkNetStitcher() {
 			_overlay = overlay;
 			_s = _v = 0;
 		}
-		overlaySimulation(int s, int v, bulkOverlay& overlay):bulkNetStitcher() {
+		overlaySimulation(int s, int v, bulkOverlay* overlay):bulkNetStitcher() {
 			_overlay = overlay;
 			_s = s;
 			_v = v;
 		}
-	    virtual void send(int nbytes) {
-			for (size_t i = 0; i < _agents.size(); i++) {
-				_agents[i]->send();
-			}
-		}
-	    virtual void recv(int nbytes) {
-			for (size_t i = 0; i < _agents.size(); i++) {
-				_agetns[i]->recv();
-			}
-		}
-		void scheduling() {
-			_overlay.scheduling(_s, _v);
-			slist<bulkFlow*>::iterator iter;
-			for (size_t i = 0; i < _agents.size(); i++) {
-				int id = _agetns[i]->getOverlayId();
-				slist<bulkFlow*>* pFlow = _overlay.getAdj(id);
-				for (iter = pFlow->begin(); iter != pFlow->end(); iter++) {
-					int s = (*iter)->getGraphEdgeSource();
-					int v = (*iter)->getGraphEdgeSink();
-					_agents[s - 1]->setUplink((*iter)->getFlow());
-					_agents[v - 1]->setDownlink((*iter)->getFlow());
-				}
-			}
-		}
-		void transfer(int vFile) {
-			
-		}
-		void rescheduling() {
-			
-		}
-
-		void updating() {
-			_overlay.updating();
-		}
-		void run() {
-			(Scheduler::instance()).run();
-		}
-		void start() {
-			bulkNetStitcher::start();
-		}
-		void stop() {
-			bulkNetStitcher::stop();
-		}
+	    virtual void send(int nbytes);
+	    virtual void recv(int nbytes);
+		void scheduling();
+		void transfer(int vFile);
+		void rescheduling();
+		void updating();
+		void run();
+		void start();
+		void stop();
 };
 #endif

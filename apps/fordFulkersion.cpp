@@ -1,6 +1,6 @@
 #include "fordFulkersion.h"
-vector<bool> fordFulkersion:: _marked;
-vector<bulkFlow> fordFulkersion::_edgeTo;
+bool* fordFulkersion:: _marked;
+bulkFlow* fordFulkersion::_edgeTo;
 double fordFulkersion::_value;
 /**
  * @brief _hasAugmentingPath 
@@ -16,6 +16,8 @@ bool fordFulkersion::_hasAugmentingPath(flowNetwork G, int s, int t)
 	queue<int> q;
 	q.push(s);
 	_marked[s] = true;
+	cout<<"s:"<<s<<endl;
+	cout<<"t:"<<t<<endl;
 	while (!q.empty()) {
 		int v = q.front();
 		q.pop();
@@ -23,7 +25,7 @@ bool fordFulkersion::_hasAugmentingPath(flowNetwork G, int s, int t)
 		slist<bulkFlow*>::iterator iter = pFlow->begin();
 		for (; iter != pFlow->end(); iter++) {
 			int w = (*iter)->other(v);
-			if ((*iter)->residualCapacityTo(w) > 0 && _marked[w]) {
+			if ((*iter)->residualCapacityTo(w) > 0 && !_marked[w]) {
 				_edgeTo[w] = **iter;
 				_marked[w] = true;
 				q.push(w);
@@ -43,12 +45,15 @@ bool fordFulkersion::_hasAugmentingPath(flowNetwork G, int s, int t)
 void fordFulkersion::FordFulkersion(flowNetwork G, int s, int t)
 {
 	int v = G.getVertices();
-	_marked.resize(v + 1);
-	_edgeTo.resize(v + 1);
+	//_marked.resize(v + 1);
+	//_edgeTo.resize(v + 1);
+	_marked = new bool[v + 1];
+	_edgeTo = new bulkFlow[v + 1];
 	_value = 0.0;
 	while (_hasAugmentingPath(G, s, t)) {
 		double bottle = MAX;
 		for (int v = t; v != s; v = _edgeTo[v].other(v)) { //计算最大流量
+			cout<<"residualCapacityTo:"<<_edgeTo[v].residualCapacityTo(v)<<endl;
 			bottle = min(bottle, _edgeTo[v].residualCapacityTo(v));
 		}
 		for (int v = t; v != s; v = _edgeTo[v].other(v)) {
@@ -61,9 +66,9 @@ void fordFulkersion::FordFulkersion(flowNetwork G, int s, int t)
 /**
  * @brief getEdgeTo 
  *
- * @return {vector<bulkFlow>}
+ * @return {bulkFlow*}
  */
-vector<bulkFlow> fordFulkersion::getEdgeTo()
+bulkFlow* fordFulkersion::getEdgeTo()
 {
 	return _edgeTo;
 }

@@ -1,6 +1,6 @@
 #include "fordFulkersion.h"
-bool* fordFulkersion:: _marked;
-bulkFlow* fordFulkersion::_edgeTo;
+vector<bool> fordFulkersion:: _marked;
+vector<bulkFlow> fordFulkersion::_edgeTo;
 double fordFulkersion::_value;
 /**
  * @brief _hasAugmentingPath 
@@ -16,8 +16,10 @@ bool fordFulkersion::_hasAugmentingPath(flowNetwork G, int s, int t)
 	queue<int> q;
 	q.push(s);
 	_marked[s] = true;
-	cout<<"s:"<<s<<endl;
-	cout<<"t:"<<t<<endl;
+	vector<bool>::iterator iter = _marked.begin();
+	for (; iter != _marked.end(); iter++) {
+		*iter = 0;
+	}
 	while (!q.empty()) {
 		int v = q.front();
 		q.pop();
@@ -26,6 +28,7 @@ bool fordFulkersion::_hasAugmentingPath(flowNetwork G, int s, int t)
 		for (; iter != pFlow->end(); iter++) {
 			int w = (*iter)->other(v);
 			if ((*iter)->residualCapacityTo(w) > 0 && !_marked[w]) {
+				//cout<<"v:"<<v<<" w:"<<w<<" flow"<<(*iter)->residualCapacityTo(w)<<endl;
 				_edgeTo[w] = **iter;
 				_marked[w] = true;
 				q.push(w);
@@ -44,31 +47,38 @@ bool fordFulkersion::_hasAugmentingPath(flowNetwork G, int s, int t)
  */
 void fordFulkersion::FordFulkersion(flowNetwork G, int s, int t)
 {
-	int v = G.getVertices();
-	//_marked.resize(v + 1);
-	//_edgeTo.resize(v + 1);
-	_marked = new bool[v + 1];
-	_edgeTo = new bulkFlow[v + 1];
+	int n = G.getVertices();
+	_marked.resize(n + 1);
+	_edgeTo.resize(n + 1);
 	_value = 0.0;
-	while (_hasAugmentingPath(G, s, t)) {
+	int count = 0;
+	while (_hasAugmentingPath(G, s, t) && count < 3) {
 		double bottle = MAX;
+		cout<<"count:"<<count<<endl;
 		for (int v = t; v != s; v = _edgeTo[v].other(v)) { //计算最大流量
-			cout<<"residualCapacityTo:"<<_edgeTo[v].residualCapacityTo(v)<<endl;
 			bottle = min(bottle, _edgeTo[v].residualCapacityTo(v));
+			if (bottle != 0) {
+				cout<<"residualCapacityTo:"<<_edgeTo[v].residualCapacityTo(v)<<endl;
+				vector<bulkFlow>::iterator iter = _edgeTo.begin();
+				for (; iter != _edgeTo.end(); iter++) {
+					cout<<(*iter).getGraphEdgeSource()<<"=>"<<(*iter).getGraphEdgeSink()<<endl;
+				}
+			}
 		}
 		for (int v = t; v != s; v = _edgeTo[v].other(v)) {
 			_edgeTo[v].addResidualFlowTo(v, bottle);
 		}
 		_value += bottle;
+		count++;
 	}
 }
 
 /**
  * @brief getEdgeTo 
  *
- * @return {bulkFlow*}
+ * @return {vector<bulkFlow>}
  */
-bulkFlow* fordFulkersion::getEdgeTo()
+vector<bulkFlow> fordFulkersion::getEdgeTo()
 {
 	return _edgeTo;
 }

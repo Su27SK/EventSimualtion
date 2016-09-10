@@ -1,5 +1,6 @@
 #include "bulkFlow.h"
-
+#include <iostream>
+using namespace std;
 /**
  * @brief getFlow 
  *

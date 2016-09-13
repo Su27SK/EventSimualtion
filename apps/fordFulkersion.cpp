@@ -1,6 +1,7 @@
 #include "fordFulkersion.h"
 vector<bool> fordFulkersion:: _marked;
 vector<int> fordFulkersion::_parent;
+vector<vector<double> > fordFulkersion::_flow;
 double fordFulkersion::rGraph[MAXMATRIX][MAXMATRIX];
 double fordFulkersion::_value;
 /**
@@ -14,13 +15,13 @@ double fordFulkersion::_value;
  */
 bool fordFulkersion::_hasAugmentingPath(bulkOverlay G, int s, int t)
 {
-	queue<int> q;
-	q.push(s);
-	_marked[s] = true;
 	vector<bool>::iterator iter = _marked.begin();
 	for (; iter != _marked.end(); iter++) {
 		*iter = 0;
 	}
+	queue<int> q;
+	q.push(s);
+	_marked[s] = true;
 	while (!q.empty()) {
 		int v = q.front();
 		q.pop();
@@ -33,6 +34,21 @@ bool fordFulkersion::_hasAugmentingPath(bulkOverlay G, int s, int t)
 		}
 	}
 	return _marked[t];
+}
+
+void fordFulkersion::_init(int n)
+{
+	_parent.resize(n);
+	for (size_t i = 0; i < _parent.size(); i++) {
+		_parent[i] = -1;
+	}
+	_flow.resize(n);
+	for (size_t i = 0; i < _flow.size(); i++) {
+		_flow[i].resize(n);
+		for (size_t j = 0; j < _flow[i].size(); j++) {
+			_flow[i][j] = 0;
+		}
+	}
 }
 
 /**
@@ -48,10 +64,9 @@ void fordFulkersion::FordFulkersion(bulkOverlay G, int s, int t, int n)
 	if (n <= 0) {
 		return;
 	}
-	_parent.clear();
+	_init(n);
 	setRGraph(G, n);
 	_marked.resize(n + 1);
-	_parent.resize(n + 1);
 	_value = 0.0;
 	while (_hasAugmentingPath(G, s, t)) {
 		double bottle = INT_MAX;
@@ -63,10 +78,10 @@ void fordFulkersion::FordFulkersion(bulkOverlay G, int s, int t, int n)
 			int w = _parent[v];
 			rGraph[w][v] -= bottle;
 			rGraph[v][w] += bottle;
+			_flow[w][v] += bottle;
 		}
 		_value += bottle;
 	}
-	cout<<"value:"<<_value<<endl;
 }
 
 /**
@@ -74,10 +89,16 @@ void fordFulkersion::FordFulkersion(bulkOverlay G, int s, int t, int n)
  *
  * @return {vector<bulkFlow>}
  */
-//vector<bulkFlow> fordFulkersion::getEdgeTo()
-//{
-	//return _edgeTo;
-//}
+vector<bulkFlow> fordFulkersion::getEdgeTo()
+{
+	vector<bulkFlow> route;
+	//for (size_t i = 0; i < _flow.size(); i++) {
+		//if (_flow[i][67] != 0) {
+			//cout<<"prev:"<<i<<" flow:"<<_flow[i][67]<<endl;
+		//}
+	//}
+	return route;
+}
 
 /**
  * @brief getValue 

@@ -16,7 +16,9 @@ class fordFulkersion
 		static double _value;
 	    static bool _hasAugmentingPath(bulkOverlay G, int s, int t);
 		static double rGraph[MAXMATRIX][MAXMATRIX];
+		static void _init(int n);
 	public:
+		static vector<vector<double> > _flow; //filled by the flow of path
 		fordFulkersion() {_value = 0.0;}
 		static void FordFulkersion(bulkOverlay G, int s, int t, int n);
 		static double getValue();

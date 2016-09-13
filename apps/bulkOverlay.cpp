@@ -67,40 +67,35 @@ void bulkOverlay::transmission(int time)
 	if (time <= 0) {
 		return ;
 	}
-	vector<bulkFlow>::iterator iter = routeToOId_.begin();
-	size_t tSize = _adj.size();
-	for (; iter != routeToOId_.end(); iter++) {
-		int sourceId = iter->getGraphEdgeSource();
-		int sinkId = iter->getGraphEdgeSink();
-		if (sourceId >=0 && sinkId >=0 && (sourceId / tSize) <= (time - 1) && (sinkId / tSize) <= (time - 1)) {
-			if (sourceId >= tSize) {
-				sourceId = sourceId % tSize + 1;
+	int tSize = _adj.size();
+	for (size_t i = 0; i < fordFulkersion::_flow.size() ; i++) {
+		for (size_t j = 0; j < fordFulkersion::_flow[i].size(); j++) {
+			double flow = fordFulkersion::_flow[i][j];
+			if ((i / tSize) <= (time - 1) && (j / tSize) <= (time - 1) && flow > 0) {
+				int fromId = i; 
+				int toId = j;
+				//cout<<"fromId:"<<fromId<<endl;
+				//cout<<"toId:"<<toId<<endl;
+				fromId = fromId >= tSize ? fromId % (tSize - 1) : fromId;
+				toId = toId >= tSize ? toId % (tSize - 1) : toId;
+				if (toId == 0) {
+					toId = toId + (tSize - 1);
+				}
+				_agents[fromId]->setUplink(flow).send();
+				_agents[toId]->setDownlink(flow).recv();
 			}
-			if (sourceId >= tSize) {
-				sinkId = sinkId % tSize + 1;
-			} 
-			_agents[sourceId]->setUplink(iter->getFlow()).setDownlink(iter->getFlow()).send();
-			_agents[sinkId]->setUplink(iter->getFlow()).setDownlink(iter->getFlow()).recv();
 		}
 	}
+	for (int i = 0; i < 27; i++) {
+		cout<<"storage:"<<_agents[i]->getStorage()<<endl;
+	}
 }
-
-/**
- * @brief preTransmssion 
- */
-void bulkOverlay::preTransmssion()
-{
-	vector<bulkFlow>::iterator iter = routeToOId_.begin();
-	vector<bulkOverlayAgent> virtualAgents;
-	
-}
-
 
 /**
  * @brief initVirtualSource 
  *
  * @param {interge} F
- * @param {interge} v
+ * @param {intergParentv
  *
  * @return {interge} 虚拟超级节点索引值
  */
@@ -155,22 +150,22 @@ void bulkOverlay::addEdge(bulkFlow e)
  */
 double bulkOverlay::scheduling(int v, int u, int F)
 {
-	double time = initNetBottlenecksWithT(v, u, F);
-	//routeToOId_ = fordFulkersion::getEdgeTo();
-	return time;
+	return initNetBottlenecksWithT(v, u, F);
 }
 
 /**
  * @brief updating 
  * 获得预测信息之后，更新每条边数据
  * @param {interge} interval
+ * @param {string} path
  * @return {boolean}
  */
-bool bulkOverlay::updating(int interval)
+bool bulkOverlay::updating(int interval, string path)
 {
 	slist<bulkFlow*>::iterator iter;
 	FILE* handle;
-	string dir = "../Bulk_Config_File/link/";
+	//string dir = "../Bulk_Config_File/link/";
+	string dir = path;
 	for (size_t i = 1; i < _adj.size(); i++) {
 		for (iter = _adj[i]->begin(); iter != _adj[i]->end(); iter++) {
 			int sourceId = (*iter)->getGraphEdgeSource();
@@ -207,14 +202,13 @@ double bulkOverlay::initNetBottlenecksWithT(int v, int u, int F)
 	//二分查找法寻找寻找min(T_max) for the volume F
 	int lowIndex = 1, highIndex = 59, mid = 0;
 	double value = 0.0;
-	cout<<"F:"<<F<<endl;
 	int count = INT_MAX;
 	while (lowIndex <= highIndex) {
 		mid = lowIndex + ((highIndex - lowIndex) / 2);
-		cout<<"mid:"<<mid<<endl;
 		initVirtual(mid);
 		int s = initVirtualSource(F, v);
-		fordFulkersion::FordFulkersion(*this, s, u, getVirtualVertices());
+		int t = u + (mid - 1) * (_adj.size() - 1);
+		fordFulkersion::FordFulkersion(*this, s, t, getVirtualVertices());
 		value = fordFulkersion::getValue();
 		if (value  >= F) {
 			highIndex = mid - 1;
@@ -223,13 +217,18 @@ double bulkOverlay::initNetBottlenecksWithT(int v, int u, int F)
 			}
 		} else if (value < F) {
 			lowIndex = mid + 1;
-		} 
+		}
 	}
-	if (mid < count) {
-		mid = count;
+	if (mid < count && F == value) {
+		count = mid;
 	}
-	cout<<"mid:"<<mid<<endl;
-	return mid;
+	initVirtual(count);
+	int s = initVirtualSource(F, v);
+	int t = u + (count - 1) * (_adj.size() - 1);
+	fordFulkersion::FordFulkersion(*this, s, t, getVirtualVertices());
+	
+	cout<<"count:"<<count<<endl;
+	return count;
 }
 
 /**

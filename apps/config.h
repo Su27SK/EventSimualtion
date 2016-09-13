@@ -4,7 +4,7 @@
 #include <vector>
 #include "bulkPool.h"
 
-#define MAXMATRIX 1000
+#define MAXMATRIX 3000
 
 extern std::vector<double> sToDemand;
 

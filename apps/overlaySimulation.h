@@ -28,6 +28,7 @@ class overlaySimulation:public bulkNetStitcher
 		double scheduling();
 		void transmission(int time);
 		void rescheduling();
-		void updating(int interval);
+		void updatingPrediction(int interval);
+		void updatingReal(int interval);
 };
 #endif

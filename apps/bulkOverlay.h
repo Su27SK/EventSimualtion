@@ -11,7 +11,6 @@ class bulkOverlay:public flowNetwork
 		vector<bulkOverlayAgent*> _agents;
 		void _init();
 	public:
-		vector<bulkFlow> routeToOId_;
 		bulkOverlay():flowNetwork() {
 			_init();
 			cout<<"Default BulkOverlay Network"<<endl;
@@ -22,10 +21,9 @@ class bulkOverlay:public flowNetwork
 		void initVirtual(int time);
 		int initVirtualSource(int F, int v);
 		void addEdge(bulkFlow e);
-		void preTransmssion();
 		void transmission(int time);
 		double scheduling(int v, int u, int F);
-		bool updating(int interval);
+		bool updating(int interval, string path);
 		double initNetBottlenecksWithT(int v, int u, int F);
 		int getVirtualVertices();
 		slist<bulkFlow> getVirtualAdj(int v);

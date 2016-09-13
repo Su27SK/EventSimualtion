@@ -8,7 +8,7 @@ double overlaySimulation::scheduling()
 	if (_s <= 0 || _v <= 0) {
 		return 0.0;
 	}
-	double time = _overlay->scheduling(_s, _v, 50);
+	double time = _overlay->scheduling(_s, _v, 200);
 	return time;
 }
 
@@ -26,7 +26,8 @@ void overlaySimulation::timeout()
 		double time;
 		if (!(now %  (_slot - 1))) {
 			int interval = now / (_slot - 1) + 1;
-			updating(interval);
+			updatingPrediction(interval);
+			updatingReal(interval);
 			double time = scheduling();
 			setDelayTime(1);
 		} else {
@@ -70,12 +71,24 @@ void overlaySimulation::transmission(int time)
 }
 
 /**
- * @brief updating 
+ * @brief updatingPrediction
  *
  * @param {interge} interval
  */
-void overlaySimulation::updating(int interval)
+void overlaySimulation::updatingPrediction(int interval)
 {
-	_overlay->updating(interval);
+	string dir = "../Bulk_Config_File/link/";
+	_overlay->updating(interval, dir);
+}
+
+/**
+ * @brief updatingReal 
+ *
+ * @param {interge} interval
+ */
+void overlaySimulation::updatingReal(int interval)
+{
+	string dir = "../Bulk_Config_File/link/";
+	_overlay->updating(interval, dir);
 }
 

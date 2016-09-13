@@ -1,40 +1,41 @@
 #include "overlaySimulation.h"
-/**
- * @brief _init 
- */
-void overlaySimulation::_init()
-{
-	int n = _overlay->getVertices();
-	for (int i = 1; i < n; i++) {
-		bulkOverlayAgent* pOverlayAgent = new bulkOverlayAgent(i);
-		_agents.push_back(pOverlayAgent);
-	}
-}
-
-/**
- * @brief run 
- */
-void overlaySimulation::run()
-{
-	(Scheduler::instance()).run();
-}
 
 /**
  * @brief scheduling 
  */
-void overlaySimulation::scheduling()
+double overlaySimulation::scheduling()
 {
-	_overlay->scheduling(_s, _v);
-	slist<bulkFlow*>::iterator iter;
-	for (size_t i = 0; i < _agents.size(); i++) {
-		int id = _agents[i]->getOverlayId();
-		slist<bulkFlow*>* pFlow = _overlay->getAdj(id);
-		for (iter = pFlow->begin(); iter != pFlow->end(); iter++) {
-			int s = (*iter)->getGraphEdgeSource();
-			int v = (*iter)->getGraphEdgeSink();
-			_agents[s - 1]->setUplink((*iter)->getFlow());
-			_agents[v - 1]->setDownlink((*iter)->getFlow());
+	if (_s <= 0 || _v <= 0) {
+		return 0.0;
+	}
+	double time = _overlay->scheduling(_s, _v, 50);
+	return time;
+}
+
+/**
+ * @brief timeout 
+ */
+void overlaySimulation::timeout()
+{
+	if (running_) {
+		if (_slot == 0) {
+			stop();
+			return;
+		} 
+		int now = time();
+		double time;
+		if (!(now %  (_slot - 1))) {
+			int interval = now / (_slot - 1) + 1;
+			updating(interval);
+			double time = scheduling();
+			setDelayTime(1);
+		} else {
+			setDelayTime(time);
+			transmission(time);
 		}
+		double t = next();
+		timer_.resched(t);
+		stop();
 	}
 }
 
@@ -45,9 +46,7 @@ void overlaySimulation::scheduling()
  */
 void overlaySimulation::send(int nbytes)
 {
-	for (size_t i = 0; i < _agents.size(); i++) {
-		_agents[i]->send();
-	}
+	
 }
 
 /**
@@ -57,31 +56,26 @@ void overlaySimulation::send(int nbytes)
  */
 void overlaySimulation::recv(int nbytes)
 {
-	for (size_t i = 0; i < _agents.size(); i++) {
-		_agents[i]->recv();
-	}
+	
 }
 
 /**
- * @brief start 
+ * @brief transmission 
+ *
+ * @param {interge} time
  */
-void overlaySimulation::start()
+void overlaySimulation::transmission(int time)
 {
-	bulkNetStitcher::start();
-}
-
-/**
- * @brief stop 
- */
-void overlaySimulation::stop() 
-{
-	bulkNetStitcher::stop();
+	_overlay->transmission(time);
 }
 
 /**
  * @brief updating 
+ *
+ * @param {interge} interval
  */
-void overlaySimulation::updating()
+void overlaySimulation::updating(int interval)
 {
-	_overlay->updating();
+	_overlay->updating(interval);
 }
+

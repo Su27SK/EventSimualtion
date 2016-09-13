@@ -6,7 +6,8 @@
  */
 bool bulkOverlayAgent::recv()
 {
-	_storage -= _downlink * time_;
+	_residualStorage -= _downlink * time_;
+	_storage += _downlink * time_;
 	return true;
 }
 
@@ -17,7 +18,10 @@ bool bulkOverlayAgent::recv()
  */
 bool bulkOverlayAgent::send()
 {
-	_storage += _uplink * time_;
+	_residualStorage += _uplink * time_;
+	if (_storage > 0) {
+		_storage -= _uplink * time_;
+	}
 	return true;
 }
 
@@ -55,6 +59,16 @@ double bulkOverlayAgent::getStorage()
 }
 
 /**
+ * @brief getResidualStorage 
+ *
+ * @return {double}
+ */
+double bulkOverlayAgent::getResidualStorage()
+{
+	return _residualStorage;
+}
+
+/**
  * @brief setStorage 
  *
  * @param {interge} nbytes
@@ -68,6 +82,19 @@ bulkOverlayAgent& bulkOverlayAgent::setStorage(int nbytes)
 }
 
 /**
+ * @brief setResidualStorage 
+ *
+ * @param {interge} nbytes
+ *
+ * @return {bulkOverlayAgent}
+ */
+bulkOverlayAgent& bulkOverlayAgent::setResidualStorage(int nbytes)
+{
+	_residualStorage = nbytes;
+	return *this;
+}
+
+/**
  * @brief setUplink 
  *
  * @param {double} flow
@@ -77,6 +104,7 @@ bulkOverlayAgent& bulkOverlayAgent::setStorage(int nbytes)
 bulkOverlayAgent& bulkOverlayAgent::setUplink(double flow)
 {
 	_uplink = flow;
+	return *this;
 }
 
 /**
@@ -89,4 +117,5 @@ bulkOverlayAgent& bulkOverlayAgent::setUplink(double flow)
 bulkOverlayAgent& bulkOverlayAgent::setDownlink(double flow)
 {
 	_downlink = flow;
+	return *this;
 }

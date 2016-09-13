@@ -22,6 +22,6 @@ class flowNetwork
 		}
 		slist<bulkFlow*>* getAdj(int v);
 		void addEdge(bulkFlow* e);
-		int getVertices();
+		virtual int getVertices();
 };
 #endif

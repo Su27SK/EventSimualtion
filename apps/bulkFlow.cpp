@@ -64,3 +64,28 @@ void bulkFlow::addResidualFlowTo(int vertex, double delta)
 	}
 }
 
+/**
+ * @brief setSourceId 
+ *
+ * @param {interge} id
+ *
+ * @return 
+ */
+bulkFlow& bulkFlow::setSourceId(int id)
+{
+	_v1 = id;
+	return *this;
+}
+
+/**
+ * @brief setSinkId 
+ *
+ * @param {interge} id
+ *
+ * @return 
+ */
+bulkFlow& bulkFlow::setSinkId(int id)
+{
+	_v2 = id;
+	return *this;
+}

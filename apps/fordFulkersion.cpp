@@ -1,17 +1,18 @@
 #include "fordFulkersion.h"
 vector<bool> fordFulkersion:: _marked;
-vector<bulkFlow> fordFulkersion::_edgeTo;
+vector<int> fordFulkersion::_parent;
+double fordFulkersion::rGraph[MAXMATRIX][MAXMATRIX];
 double fordFulkersion::_value;
 /**
  * @brief _hasAugmentingPath 
  * 是否还存在增广路径
- * @param {flowNetwork} G
+ * @param {bulkOverlay} G
  * @param {interge} s
  * @param {interge} t
  *
  * @return {boolean}
  */
-bool fordFulkersion::_hasAugmentingPath(flowNetwork G, int s, int t)
+bool fordFulkersion::_hasAugmentingPath(bulkOverlay G, int s, int t)
 {
 	queue<int> q;
 	q.push(s);
@@ -23,13 +24,9 @@ bool fordFulkersion::_hasAugmentingPath(flowNetwork G, int s, int t)
 	while (!q.empty()) {
 		int v = q.front();
 		q.pop();
-		slist<bulkFlow*>* pFlow = G.getAdj(v);
-		slist<bulkFlow*>::iterator iter = pFlow->begin();
-		for (; iter != pFlow->end(); iter++) {
-			int w = (*iter)->other(v);
-			if ((*iter)->residualCapacityTo(w) > 0 && !_marked[w]) {
-				//cout<<"v:"<<v<<" w:"<<w<<" flow"<<(*iter)->residualCapacityTo(w)<<endl;
-				_edgeTo[w] = **iter;
+		for (size_t w = 0; w < _marked.size(); w++) {
+			if (rGraph[v][w] > 0 && !_marked[w]) {
+				_parent[w] = v;
 				_marked[w] = true;
 				q.push(w);
 			}
@@ -41,36 +38,35 @@ bool fordFulkersion::_hasAugmentingPath(flowNetwork G, int s, int t)
 /**
  * @brief FordFulkersion 
  * 
- * @param {flowNetwork} G
+ * @param {bulkOverlay} G
  * @param {interge} s
  * @param {interge} t
+ * @param {interge} n
  */
-void fordFulkersion::FordFulkersion(flowNetwork G, int s, int t)
+void fordFulkersion::FordFulkersion(bulkOverlay G, int s, int t, int n)
 {
-	int n = G.getVertices();
+	if (n <= 0) {
+		return;
+	}
+	_parent.clear();
+	setRGraph(G, n);
 	_marked.resize(n + 1);
-	_edgeTo.resize(n + 1);
+	_parent.resize(n + 1);
 	_value = 0.0;
-	int count = 0;
-	while (_hasAugmentingPath(G, s, t) && count < 3) {
-		double bottle = MAX;
-		cout<<"count:"<<count<<endl;
-		for (int v = t; v != s; v = _edgeTo[v].other(v)) { //计算最大流量
-			bottle = min(bottle, _edgeTo[v].residualCapacityTo(v));
-			if (bottle != 0) {
-				cout<<"residualCapacityTo:"<<_edgeTo[v].residualCapacityTo(v)<<endl;
-				vector<bulkFlow>::iterator iter = _edgeTo.begin();
-				for (; iter != _edgeTo.end(); iter++) {
-					cout<<(*iter).getGraphEdgeSource()<<"=>"<<(*iter).getGraphEdgeSink()<<endl;
-				}
-			}
+	while (_hasAugmentingPath(G, s, t)) {
+		double bottle = INT_MAX;
+		for (int v = t; v != s; v = _parent[v]) {
+			int w = _parent[v];
+			bottle = min(bottle, rGraph[w][v]);
 		}
-		for (int v = t; v != s; v = _edgeTo[v].other(v)) {
-			_edgeTo[v].addResidualFlowTo(v, bottle);
+		for (int v = t; v != s; v = _parent[v]) {
+			int w = _parent[v];
+			rGraph[w][v] -= bottle;
+			rGraph[v][w] += bottle;
 		}
 		_value += bottle;
-		count++;
 	}
+	cout<<"value:"<<_value<<endl;
 }
 
 /**
@@ -78,10 +74,10 @@ void fordFulkersion::FordFulkersion(flowNetwork G, int s, int t)
  *
  * @return {vector<bulkFlow>}
  */
-vector<bulkFlow> fordFulkersion::getEdgeTo()
-{
-	return _edgeTo;
-}
+//vector<bulkFlow> fordFulkersion::getEdgeTo()
+//{
+	//return _edgeTo;
+//}
 
 /**
  * @brief getValue 
@@ -103,4 +99,28 @@ double fordFulkersion::getValue()
 bool fordFulkersion::intCut(int v)
 {
 	return _marked[v];	
+}
+
+/**
+ * @brief setRGraph 
+ *
+ * @param {bulkOverlay} G
+ * @param {interge} n
+ */
+void fordFulkersion::setRGraph(bulkOverlay G, int n)
+{
+	for (int i = 0; i < MAXMATRIX; i++) {
+		for (int j = 0; j < MAXMATRIX; j++) {
+			rGraph[i][j] = 0;
+		}
+	}
+	for (int v = 0; v < n; v++) {
+		slist<bulkFlow> pFlow = G.getVirtualAdj(v);
+		slist<bulkFlow>::iterator iter = pFlow.begin();
+		for (; iter != pFlow.end(); iter++) {
+			int fromId = iter->getGraphEdgeSource();
+			int toId = iter->getGraphEdgeSink();
+			rGraph[fromId][toId] = iter->getCapacity();
+		}
+	}
 }

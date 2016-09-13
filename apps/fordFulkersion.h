@@ -3,20 +3,25 @@
 #include <vector>
 #include <queue>
 #include <algorithm>
+#include <limits.h>
 #include "config.h"
 #include "flowNetwork.h"
+#include "bulkOverlay.h"
+class bulkOverlay;
 class fordFulkersion
 {
 	private:
 		static vector<bool> _marked;
-		static vector<bulkFlow> _edgeTo;
+		static vector<int> _parent; //filled by BFS and to store path
 		static double _value;
-	    static bool _hasAugmentingPath(flowNetwork G, int s, int t);
+	    static bool _hasAugmentingPath(bulkOverlay G, int s, int t);
+		static double rGraph[MAXMATRIX][MAXMATRIX];
 	public:
 		fordFulkersion() {_value = 0.0;}
-		static void FordFulkersion(flowNetwork G, int s, int t);
+		static void FordFulkersion(bulkOverlay G, int s, int t, int n);
 		static double getValue();
 		static vector<bulkFlow> getEdgeTo();
+		static void setRGraph(bulkOverlay G, int n);
 		static bool intCut(int v);
 		static void clear();
 };

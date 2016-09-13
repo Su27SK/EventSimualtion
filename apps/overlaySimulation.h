@@ -1,35 +1,33 @@
 #ifndef _OVERLAYSIMULATION_H_
 #define _OVERLAYSIMULATION_H_
 #include "bulkOverlay.h"
-#include "bulkOverlayAgent.h"
 #include "bulkNetStitcher.h"
 #include "Scheduler.h"
 class overlaySimulation:public bulkNetStitcher
 {
 	private:
 		bulkOverlay* _overlay;
-		vector<bulkOverlayAgent*> _agents;
 		int _s;   //source
 		int _v;   //sink
-		void _init();
+		int _slot; //slot
 	public:
-		overlaySimulation(bulkOverlay* overlay):bulkNetStitcher() {
+		overlaySimulation(bulkOverlay* overlay, int slot):bulkNetStitcher() {
 			_overlay = overlay;
 			_s = _v = 0;
+			_slot = slot;
 		}
-		overlaySimulation(int s, int v, bulkOverlay* overlay):bulkNetStitcher() {
+		overlaySimulation(int s, int v, bulkOverlay* overlay, int slot):bulkNetStitcher() {
 			_overlay = overlay;
 			_s = s;
 			_v = v;
+			_slot = slot;
 		}
+		virtual void timeout();
 	    virtual void send(int nbytes);
 	    virtual void recv(int nbytes);
-		void scheduling();
-		void transfer(int vFile);
+		double scheduling();
+		void transmission(int time);
 		void rescheduling();
-		void updating();
-		void run();
-		void start();
-		void stop();
+		void updating(int interval);
 };
 #endif

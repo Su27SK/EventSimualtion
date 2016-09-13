@@ -21,5 +21,7 @@ class bulkFlow: public GraphEdge
 		//v中残留流量
 		double residualCapacityTo(int vertex);
 		void addResidualFlowTo(int vertex, double delta);
+		bulkFlow& setSourceId(int id);
+		bulkFlow& setSinkId(int id);
 };
 #endif

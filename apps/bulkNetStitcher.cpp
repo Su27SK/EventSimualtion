@@ -23,15 +23,21 @@ void bulkNetStitcher::stop()
 }
 
 /**
- * @brief timeout 
+ * @brief time 
+ *
+ * @return {double}
  */
-void bulkNetStitcher::timeout()
+double bulkNetStitcher::time()
 {
-	if (running_) {
-		cout<<"I Love You!"<<endl;
-		double t = next();
-		timer_.resched(t);
-	}
+	return (Scheduler::instance()).clock();
+}
+
+/**
+ * @brief run 
+ */
+void bulkNetStitcher::run()
+{
+	(Scheduler::instance()).run();
 }
 
 /**
@@ -41,5 +47,16 @@ void bulkNetStitcher::timeout()
  */
 inline double bulkNetStitcher::next()
 {
-	return 1;
+	return _delaytime;
+}
+
+/**
+ * @brief setDelayTime 
+ *
+ * @param {double} time
+ */
+bool bulkNetStitcher::setDelayTime(double time)
+{
+	_delaytime = time;
+	return true;
 }

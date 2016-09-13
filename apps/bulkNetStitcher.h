@@ -4,7 +4,6 @@
 #include "bulkOverlay.h"
 #include "Application.h"
 class bulkNetStitcher;
-
 class bulkNetStitcherTimer: public TimerHandler
 {
 	public:
@@ -16,13 +15,20 @@ class bulkNetStitcherTimer: public TimerHandler
 
 class bulkNetStitcher: public Application
 {
+	private:
+		double _delaytime;
 	public:
-		bulkNetStitcher():Application(), running_(0), timer_(this) {}
-		void timeout();
-	protected:
+		bulkNetStitcher():Application(), running_(0), timer_(this) {
+			_delaytime = 1.0;
+		}
+		virtual void timeout() = 0;
 		void start();
 		void stop();
+		void run();
+		bool setDelayTime(double time);
+	protected:
 		double next();
+		double time();
 		int running_;
 		bulkNetStitcherTimer timer_;
 };

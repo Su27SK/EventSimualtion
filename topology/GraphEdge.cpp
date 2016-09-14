@@ -12,7 +12,8 @@ GraphEdge::GraphEdge(GraphEdge& edge)
 	_v1 = edge._v1;
 	_v2 = edge._v2;
 	_weight = edge._weight;
-	_capacity = edge._weight;
+	//_capacity = edge._weight;
+	_capacity = edge._capacity;
 }
 
 GraphEdge::GraphEdge(const GraphEdge& edge)
@@ -20,7 +21,8 @@ GraphEdge::GraphEdge(const GraphEdge& edge)
 	_v1 = edge._v1;
 	_v2 = edge._v2;
 	_weight = edge._weight;
-	_capacity = edge._weight;
+	//_capacity = edge._weight;
+	_capacity = edge._capacity;
 }
 
 /**

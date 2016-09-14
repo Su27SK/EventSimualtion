@@ -81,6 +81,7 @@ void bulkOverlay::transmission(int time)
 				if (toId == 0) {
 					toId = toId + (tSize - 1);
 				}
+				//double limitLink = _agents[fromId]->get
 				_agents[fromId]->setUplink(flow).send();
 				_agents[toId]->setDownlink(flow).recv();
 			}
@@ -205,6 +206,7 @@ double bulkOverlay::initNetBottlenecksWithT(int v, int u, int F)
 	int count = INT_MAX;
 	while (lowIndex <= highIndex) {
 		mid = lowIndex + ((highIndex - lowIndex) / 2);
+		cout<<"mid:"<<mid<<endl;
 		initVirtual(mid);
 		int s = initVirtualSource(F, v);
 		int t = u + (mid - 1) * (_adj.size() - 1);

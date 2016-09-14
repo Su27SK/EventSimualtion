@@ -140,3 +140,4 @@ void bulkNode::addInputLink(bulkLink* link)
 	link->setHeadId(input_->size());
 	input_->push_front(link);
 }
+

@@ -1,7 +1,6 @@
 #ifndef _APPLICATION_H_
 #define _APPLICATION_H_
-#include "Process.h"
-class Application : public Process
+class Application 
 {
 	public:
 		Application():enableRecv_(0), enableResume_(0){};

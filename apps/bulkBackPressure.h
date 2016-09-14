@@ -7,18 +7,22 @@
 class bulkBackPressure:public bulkNetwork
 {
 	private:
-		void _initAgents();
-		void _initVirtualAgents();
+		void _inputPackets();
 		void _inputPackets(bulkAgent* vAgent, int sId);
 		vector<bulkAgent*> _agents;
 		vector<bulkAgent*> _vAgents; //虚拟Agents
+		FILE* _handle;
 	public:
-		bulkBackPressure():bulkNetwork() {}
+		bulkBackPressure():bulkNetwork() {
+			RandomGenerator::init(time(NULL));
+			_handle = NULL;
+		}
 		bulkBackPressure(Graph* graph): bulkNetwork(graph) {
 			RandomGenerator::init(time(NULL));
-			_initAgents();
+			_handle = NULL;
 		}
-		void inputPackets();
+		void initVirtualAgents();
+		void initAgents();
 		bulkBackPressure& setSession(int sId, int sourceId, int sinkId, double demand);
 		virtual void handle();
 };

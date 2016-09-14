@@ -78,6 +78,12 @@ void bulkAgent::sendFromAgent(bulkLink& link)
 		} else {
 			packets = _sendbuf[tailId].getPacketsStore(i);
 		}
+		int source = link.getGraphEdgeSource();
+		int sink = link.getGraphEdgeSink();
+		if (packets->size() != 0) {
+			int nPackets = packets->size();
+			//cout<<"tailId:"<<tailId<<" send from source:"<<source<<" to sink:"<<sink<<" nPackets:"<<nPackets<<endl;
+		}
 		while (!packets->empty()) {
 			bulkPacket& packet = packets->front();
 			link.tailbuf_.pushPacketsToBuf(i, packet);
@@ -158,14 +164,17 @@ int bulkAgent::reallocPackets(int sId)
 	int tag = OUT;
 	slist<bulkLink*>::iterator iter;
 	slist<bulkLink*>* pLink = _node.getOutputLink();
+	bulkBuffer* pBuf;
+	int* bufSum;
+	int count;
+	//cout<<"nodeId:"<<_node.getNodeId()<<endl;
 	while (tag != DEFAULT) {
 		for (iter = pLink->begin(); iter != pLink->end(); iter++) {
 			if ((singleWeight = (*iter)->getWeight()) != 0) { 
-				int count = 0, index;
+				count = 0;
+				int index;
 				double proportion = (1/singleWeight) / allWeight;
 				double num = ROUND(sum * proportion);
-				bulkBuffer* pBuf;
-				int* bufSum;
 				if (tag == OUT) {
 					index = (*iter)->getTailId();
 					bufSum = &((*iter)->tailBufNum_[sId]);
@@ -187,6 +196,14 @@ int bulkAgent::reallocPackets(int sId)
 		pLink = _node.getInputLink();
 		tag++;
 	}
+	while (!qsv->empty()) {
+		bulkPacket& packet = qsv->front();
+		pBuf->pushPacketsToBuf(sId, packet);
+		qsv->pop_front();
+		count++;
+	}
+	*bufSum = count;
+
 	qsv->~slist();
 	qsv = NULL;
 	return (int)sum;
@@ -201,7 +218,9 @@ int bulkAgent::reallocPackets(int sId)
  */
 float bulkAgent::reallocRequests(bulkLink& link)
 {
-	double nowCapacity = link.getCapacity();
+	int sourceId = link.getGraphEdgeSource();
+	int sinkId = link.getGraphEdgeSink();
+	double nowCapacity = link.getCapacity() * 10;
 	double fiNum = 0;
 	map<double, int> sorted;
 	//遍历session
@@ -231,6 +250,7 @@ float bulkAgent::reallocRequests(bulkLink& link)
 				fi--;
 				fiNum--;
 			}
+			cout<<"from:"<<sourceId<<" to:"<<sinkId<<" fi:"<<fi<<endl;
 		    fsum += fi * (difference - fi) / pow (demand, 2);
 			_requestBuf[tailId][sId] = fi;
 		}
@@ -335,11 +355,14 @@ void bulkAgent::setRecvBuf(int num)
 /**
  * @brief reallocAll 
  */
-void bulkAgent::reallocAll()
+int bulkAgent::reallocAll()
 {
+	int totalPackets = 0;
 	for (int i = 1; i <= MAXSESSION; i++) {
-		reallocPackets(i);
+		int singleSum = reallocPackets(i);
+		totalPackets += singleSum;
 	}
+	return totalPackets;
 }
 
 /**
@@ -351,18 +374,6 @@ void bulkAgent::reallocAllRequests()
 	slist<bulkLink*>::iterator iter = pLink->begin();
 	for (; iter != pLink->end(); iter++) {
 		reallocRequests(**iter);
-	}
-}
-
-/**
- * @brief addVirtualInputLink 
- * 增加虚拟进入链路
- * @param {bulkLink*} link
- */
-void bulkAgent::addVirtualInputLink(bulkLink* link)
-{
-	if (fake_) {
-		_node.addInputLink(link);
 	}
 }
 

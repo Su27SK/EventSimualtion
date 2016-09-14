@@ -57,12 +57,18 @@ void bulkNetwork::init()
 				if (aList[i].getNodeId() == iter->getGraphEdgeSource()) {
 					bulkLink* link = new bulkLink(*iter);
 					pNode->addOutputLink(link);
-				} else if (aList[i].getNodeId() == iter->getGraphEdgeSink()) {
-					bulkLink* link = new bulkLink(*iter);
-					pNode->addInputLink(link);
-				}
+				} 
 			}
 			nList_.push_back(*pNode);
+		}
+		for (int i = 0; i < nList_.size(); i++) {
+			slist<bulkLink*>* pLink = nList_[i].getOutputLink();
+			slist<bulkLink*>::iterator iter = pLink->begin();
+			for (; iter != pLink->end(); iter++) {
+				int index = (*iter)->getGraphEdgeSink() - 1;
+				bulkNode* pNode = &nList_[index]; 
+				pNode->addInputLink(*iter);
+			}
 		}
 	}
 }

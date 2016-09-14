@@ -51,10 +51,10 @@ void bulkBuffer::pushPacketsToBuf(int sId, bulkPacket& packet)
  */
 slist<bulkPacket>* bulkBuffer::pullPacketsFromBuf(int sId, int num)
 {
-	slist<bulkPacket>* pPackets = new slist<bulkPacket>();
-	int count = 0;
 	try {
 		sId = _check(sId);
+		slist<bulkPacket>* pPackets = new slist<bulkPacket>();
+		int count = 0;
 		while (!_buffers[sId]->empty() && count < num) {
 			bulkPacket& packet = _buffers[sId]->front();
 			pPackets->push_front(packet);

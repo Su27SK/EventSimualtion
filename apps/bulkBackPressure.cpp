@@ -4,8 +4,15 @@
  */
 void bulkBackPressure::handle()
 {
-	vector<bulkAgent*>::iterator aIter = _agents.begin();
-	inputPackets();
+	_inputPackets();
+	if (_vAgents.empty()) {
+		cout<<"No Virtual Node, Must initVirtualAgents Function"<<endl;
+		return;
+	}
+	if (_agents.empty()) {
+		cout<<"No Agents Node, Must initAgents Function"<<endl;
+		return;
+	}
 	for (int i = 0; i < _vAgents.size(); i++) {
 		_vAgents[i]->send();
 	}
@@ -14,14 +21,15 @@ void bulkBackPressure::handle()
 	}
 	for (int i = 0; i < _agents.size(); i++) {
 		_agents[i]->recv();
-		_agents[i]->reallocAll();
+		int num = _agents[i]->reallocAll();
+		//cout<<"aId:"<<_agents[i]->getAId()<<" num:"<<num<<endl;
 	}
 }
 
 /**
- * @brief _initAgent 
+ * @brief initAgent 
  */
-void bulkBackPressure::_initAgents()
+void bulkBackPressure::initAgents()
 {
 	vector<bulkNode>::iterator iter = nList_.begin();
 	for (; iter != nList_.end(); iter++) {
@@ -31,9 +39,9 @@ void bulkBackPressure::_initAgents()
 }
 
 /**
- * @brief _initVirtualAgents 
+ * @brief initVirtualAgents 
  */
-void bulkBackPressure::_initVirtualAgents()
+void bulkBackPressure::initVirtualAgents()
 {
 	map<int, bulkNode*>::iterator mIter = sourceList_.begin();
 	for (; mIter != sourceList_.end(); mIter++) {
@@ -59,9 +67,17 @@ void bulkBackPressure::_inputPackets(bulkAgent* vAgent, int sId)
 		check(sId, 1, MAXSESSION);
 		int m = sToDemand[sId];
 		if (m > 0) {
-			int nPacket = RandomGenerator::genPoissonInt(m);
+			//int nPackets = RandomGenerator::genPoissonInt(m);
+			if (_handle == NULL) {
+				_handle = fopen("../Bulk_Config_File/InputPackets.txt", "r");
+			}
+			char buf[10];
+			fgets(buf, 9, _handle);
+			cout<<"Hello World"<<endl;
+			int nPackets = buf[0] - '0';
+			cout<<"nPacket:"<<nPackets<<endl;
 			int count = 0;
-			while (count < m) {
+			while (count < nPackets) {
 				bulkPacket& packet = pool.getPacketsFromPool();
 				vAgent->inputVirtualNode(packet, sId);
 				count++;
@@ -73,11 +89,10 @@ void bulkBackPressure::_inputPackets(bulkAgent* vAgent, int sId)
 }
 
 /**
- * @brief inputPackets 
+ * @brief _inputPackets 
  */
-void bulkBackPressure::inputPackets() 
+void bulkBackPressure::_inputPackets() 
 {
-	_initVirtualAgents();
 	vector<bulkAgent*>::iterator vIter = _vAgents.begin(); 
 	for (; vIter != _vAgents.end(); vIter++) {
 		int id = (*vIter)->getAId();

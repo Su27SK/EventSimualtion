@@ -19,7 +19,8 @@ int main(int argc, char* argv[])
 	//backPressure->handle();
 	bulkOverlay* overlay = new bulkOverlay(graph);
 	//overlay->updating(2);
-	overlaySimulation* pSimulation = new overlaySimulation(1, 13, overlay, 60);
+	overlaySimulation* pSimulation = new overlaySimulation(1, 16, overlay, 60);
+	pSimulation->updatingPrediction(1);
 	pSimulation->scheduling();
 	pSimulation->transmission(40);
 	//overlay->initVirtual(1);

@@ -7,12 +7,15 @@ class bulkPacket: public Packet
 		//标签，会话id, 起始Node id, 到达Node id, 起始时间
 		int _sId;
 		int _sourceId;
-		int _sinkId;
-		double _bTime;  
+		double _bTime;
+		int _hopCount;
+		int _nowId;
 
 		bulkPacket():Packet() {
-			_sId = _sourceId = _sinkId = -1;
+			_sId = _sourceId = -1;
 			_bTime = -1;
+			_nowId = -1;
+			_hopCount = 0;
 		}
 		~bulkPacket(){}
 };

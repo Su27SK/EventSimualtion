@@ -9,10 +9,10 @@
 void bulkNetwork::check(int id, int min, int max) const throw(bulkException)
 {
 	if (topology_ == NULL) {
-		throw new bulkException("topolog is not auloaded\n");
+		throw bulkException("topolog is not auloaded\n");
 	}
-	if (id > max && id < min) {
-		throw new bulkException("id is out of range\n");
+	if (id > max || id < min) {
+		throw bulkException("id is out of range\n");
 	}
 }
 
@@ -21,9 +21,11 @@ void bulkNetwork::check(int id, int min, int max) const throw(bulkException)
  * 处理异常函数
  * @param {bulkException} e
  */
-void bulkNetwork::handleOverException(bulkException e) const
+void bulkNetwork::handleOverException(bulkException e, string error) const
 {
 	e.init(__FILE__, __PRETTY_FUNCTION__, __LINE__);
+	cout<<error<<":";
+	cout<<e.getMessage()<<endl;
 	cout<<e.what()<<endl;
 }
 
@@ -93,8 +95,9 @@ bulkNetwork& bulkNetwork::setSourceNode(int id, int sId)
 		nSource_++;
 		return *this;
 	} catch (bulkException e) {
-		handleOverException(e);
-	}
+		handleOverException(e, "setSourceNode function");
+		exit(0);
+	} 
 }
 
 /**
@@ -112,12 +115,14 @@ bulkNetwork& bulkNetwork::setSinkNode(int id, int sId)
 		check(id, 1, n);
 		check(sId, 1, MAXSESSION);
 		int indexId = id - 1;
+		bulkNode node = nList_[indexId];
 		nList_[indexId].setTerminal(sId);
 		sinkList_.insert(pair<int, bulkNode*>(id, &nList_[indexId]));
 		nSink_++;
 		return *this;
 	} catch (bulkException e) {
-		handleOverException(e);
+		handleOverException(e, "setSinkNode function");
+		exit(0);
 	}
 }
 
@@ -174,7 +179,8 @@ const bulkNode& bulkNetwork::getNodeById(int id) const
 		id--;
 		return nList_[id];
 	} catch (bulkException e) {
-		handleOverException(e);
+		handleOverException(e, "getNodeById function");
+		exit(0);
 	}
 }
 
@@ -189,4 +195,3 @@ void bulkNetwork::setGraph(Graph* graph)
 		topology_ = graph;
 	}
 }
-

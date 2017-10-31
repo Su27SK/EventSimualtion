@@ -1,19 +1,25 @@
 #ifndef	_CONFIG_H_
 #define	_CONFIG_H_
-#define MAXSESSION 1
+#define MAXSESSION 2
 #include <vector>
 #include "bulkPool.h"
+#include "db.h"
 
-#define MAXMATRIX 3000
+#define MAXMATRIX 20000
+#define MAXROUTE 30
 
 extern std::vector<double> sToDemand;
 
 extern bulkPool pool;
 
+extern db db_;
+
 const int M = 4;
 
-const double MAX = 100000; 
+extern int simTime_;
 
-const double MAXCAPACITY = 100000; //可以存储的容量
+extern int interval_;
 
+extern vector<string> log_packet[MAXSESSION];
+extern vector<string> log_nodeInfo[MAXROUTE];
 #endif

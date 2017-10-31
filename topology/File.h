@@ -12,6 +12,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <map>
+#include "baseException.h"
 using namespace std;
 typedef struct aPathInfo
 {

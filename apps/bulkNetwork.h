@@ -21,7 +21,7 @@ class bulkNetwork
 		}
 		void init();
 		void check(int id, int min, int Max) const throw(bulkException);
-		void handleOverException(bulkException e) const;
+		void handleOverException(bulkException e, string error) const;
 		void setGraph(Graph* graph);
 		virtual void handle() = 0;
 		bulkNetwork(Graph* graph);

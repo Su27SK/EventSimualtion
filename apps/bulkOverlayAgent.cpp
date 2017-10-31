@@ -6,11 +6,6 @@
  */
 bool bulkOverlayAgent::recv()
 {
-	if (_downlink >= _limitDownlink) {
-		_downlink = _limitDownlink;
-	}
-	_residualStorage -= _downlink * time_;
-	_storage += _downlink * time_;
 	return true;
 }
 
@@ -21,14 +16,39 @@ bool bulkOverlayAgent::recv()
  */
 bool bulkOverlayAgent::send()
 {
-	if (_uplink >= _limitUplink) {
-		_uplink = _limitUplink;
-	}
-	_residualStorage += _uplink * time_;
-	if (_storage > 0) {
-		_storage -= _uplink * time_;
-	}
 	return true;
+}
+
+/**
+ * @brief recv 
+ *
+ * @param {double} amount
+ *
+ * @return {double}
+ */
+double bulkOverlayAgent::recv(double amount)
+{
+	_residualStorage -= amount;
+	_storage += amount;
+	return amount;
+}
+
+/**
+ * @brief send 
+ *
+ * @param {double} amount
+ *
+ * @return {double}
+ */
+double bulkOverlayAgent::send(double amount)
+{
+	double check = _storage - amount;
+	if (check < 0.0) {
+		amount = _storage;
+	}
+	_storage -= amount;
+	_residualStorage += amount;
+	return amount;
 }
 
 /**
@@ -125,30 +145,3 @@ bulkOverlayAgent& bulkOverlayAgent::setDownlink(double flow)
 	_downlink = flow;
 	return *this;
 }
-
-/**
- * @brief setLimitUplink 
- *
- * @param {double} flow
- *
- * @return {bulkOverlayAgent}
- */
-bulkOverlayAgent& bulkOverlayAgent::setLimitUplink(double flow)
-{
-	_limitUplink = flow;
-	return *this;
-}
-
-/**
- * @brief setLimitDownlink 
- *
- * @param {double} flow
- *
- * @return {bulkOverlayAgent}
- */
-bulkOverlayAgent& bulkOverlayAgent::setLimitDownlink(double flow)
-{
-	_limitDownlink = flow;
-	return *this;
-}
-

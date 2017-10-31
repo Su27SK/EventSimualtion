@@ -8,36 +8,54 @@ double overlaySimulation::scheduling()
 	if (_s <= 0 || _v <= 0) {
 		return 0.0;
 	}
-	double time = _overlay->scheduling(_s, _v, 200);
+	double time = _overlay->scheduling(0, _s, _v, 800);
 	return time;
 }
 
 /**
  * @brief timeout 
  */
-void overlaySimulation::timeout()
+void overlaySimulation::timeout(double time)
 {
 	if (running_) {
 		if (_slot == 0) {
 			stop();
 			return;
-		} 
-		int now = time();
-		double time;
-		if (!(now %  (_slot - 1))) {
-			int interval = now / (_slot - 1) + 1;
-			updatingPrediction(interval);
-			updatingReal(interval);
-			double time = scheduling();
-			setDelayTime(1);
-		} else {
-			setDelayTime(time);
-			transmission(time);
 		}
-		double t = next();
-		timer_.resched(t);
-		stop();
+		int F = 2000000;
+		int baseTime = 0;
+		int temp = 3;
+		//_overlay->setAllStorage(_s, _v);
+		for (int k = 1; k <= 1; k++) {
+			//baseTime = (k - 1) * 60;
+			baseTime = (k - 1) * temp;
+			//for (int i = baseTime; i <= 60 * k; i++) {
+			for (int i = baseTime; i <= temp * k; i++) {
+				updatingReal(i);
+			}
+			int interval = _overlay->scheduling(baseTime, 1, 16, F);
+			//_overlay->transmission(baseTime, 1, 16, interval);
+		}
 	}
+}
+
+/**
+ * @brief setLog 
+ *
+ * @param {interge} time
+ */
+void overlaySimulation::setLog(int time)
+{
+	_overlay->setLog(time);
+}
+
+/**
+ * @brief timeout 
+ *
+ */
+void overlaySimulation::timeout()
+{
+	cout<<"Hello World"<<endl;
 }
 
 /**
@@ -67,7 +85,10 @@ void overlaySimulation::recv(int nbytes)
  */
 void overlaySimulation::transmission(int time)
 {
-	_overlay->transmission(time);
+	if (_s <= 0 || _v <= 0) {
+		return ;
+	}
+	_overlay->transmission(0, _s, _v, time);
 }
 
 /**
@@ -77,8 +98,8 @@ void overlaySimulation::transmission(int time)
  */
 void overlaySimulation::updatingPrediction(int interval)
 {
-	string dir = "../Bulk_Config_File/link/";
-	_overlay->updating(interval, dir);
+	string dir = "../Bulk_Config_File/link/5_error/";
+	_overlay->updating(interval, dir, 0);
 }
 
 /**
@@ -89,6 +110,5 @@ void overlaySimulation::updatingPrediction(int interval)
 void overlaySimulation::updatingReal(int interval)
 {
 	string dir = "../Bulk_Config_File/link/";
-	_overlay->updating(interval, dir);
+	_overlay->updating(interval, dir, 1);
 }
-

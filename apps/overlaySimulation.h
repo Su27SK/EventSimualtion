@@ -22,10 +22,12 @@ class overlaySimulation:public bulkNetStitcher
 			_v = v;
 			_slot = slot;
 		}
+		virtual void timeout(double time);
 		virtual void timeout();
 	    virtual void send(int nbytes);
 	    virtual void recv(int nbytes);
 		double scheduling();
+		void setLog(int time);
 		void transmission(int time);
 		void rescheduling();
 		void updatingPrediction(int interval);

@@ -38,6 +38,7 @@ void bulkBuffer::pushPacketsToBuf(int sId, bulkPacket& packet)
 		_buffers[sId]->push_front(packet);
 	} catch (bulkException e) {
 		_handleOverException(e);
+		exit(0);
 	}
 }
 
@@ -53,7 +54,7 @@ slist<bulkPacket>* bulkBuffer::pullPacketsFromBuf(int sId, int num)
 {
 	try {
 		sId = _check(sId);
-		slist<bulkPacket>* pPackets = new slist<bulkPacket>();
+		slist<bulkPacket>* pPackets = new slist<bulkPacket>(0);
 		int count = 0;
 		while (!_buffers[sId]->empty() && count < num) {
 			bulkPacket& packet = _buffers[sId]->front();
@@ -64,6 +65,7 @@ slist<bulkPacket>* bulkBuffer::pullPacketsFromBuf(int sId, int num)
 		return pPackets;
 	} catch (bulkException e) {
 		_handleOverException(e);
+		exit(0);
 	}
 }
 
@@ -81,6 +83,7 @@ slist<bulkPacket>* bulkBuffer::getPacketsStore(int sId)
 		return _buffers[sId];
 	} catch (bulkException e) {
 		_handleOverException(e);
+		exit(0);
 	}
 }
 

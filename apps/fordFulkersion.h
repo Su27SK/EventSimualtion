@@ -16,6 +16,7 @@ class fordFulkersion
 		static double _value;
 	    static bool _hasAugmentingPath(bulkOverlay G, int s, int t);
 		static double rGraph[MAXMATRIX][MAXMATRIX];
+		static double sGraph[MAXMATRIX][MAXMATRIX];
 		static void _init(int n);
 	public:
 		static vector<vector<double> > _flow; //filled by the flow of path
@@ -25,6 +26,7 @@ class fordFulkersion
 		static vector<bulkFlow> getEdgeTo();
 		static void setRGraph(bulkOverlay G, int n);
 		static bool intCut(int v);
+		static double getEdgeRateBySecond(int s, int e);
 		static void clear();
 };
 #endif

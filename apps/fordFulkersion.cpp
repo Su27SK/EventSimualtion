@@ -3,7 +3,9 @@ vector<bool> fordFulkersion:: _marked;
 vector<int> fordFulkersion::_parent;
 vector<vector<double> > fordFulkersion::_flow;
 double fordFulkersion::rGraph[MAXMATRIX][MAXMATRIX];
+double fordFulkersion::sGraph[MAXMATRIX][MAXMATRIX];
 double fordFulkersion::_value;
+
 /**
  * @brief _hasAugmentingPath 
  * 是否还存在增广路径
@@ -79,9 +81,18 @@ void fordFulkersion::FordFulkersion(bulkOverlay G, int s, int t, int n)
 			rGraph[w][v] -= bottle;
 			rGraph[v][w] += bottle;
 			_flow[w][v] += bottle;
+			_flow[v][w] = -_flow[w][v];
 		}
 		_value += bottle;
+		cout<<"value:"<<_value<<endl;
 	}
+	//for (size_t i = 0; i < _flow.size(); i++) {
+		//for (size_t j = 0; j < _flow[i].size(); j++) {
+			//if (_flow[i][j] != 0) {
+				//cout<<"i:"<<i<<"=>j:"<<j<<" flow:"<<_flow[i][j]<<endl;
+			//}
+		//}
+	//}
 }
 
 /**
@@ -92,11 +103,6 @@ void fordFulkersion::FordFulkersion(bulkOverlay G, int s, int t, int n)
 vector<bulkFlow> fordFulkersion::getEdgeTo()
 {
 	vector<bulkFlow> route;
-	//for (size_t i = 0; i < _flow.size(); i++) {
-		//if (_flow[i][67] != 0) {
-			//cout<<"prev:"<<i<<" flow:"<<_flow[i][67]<<endl;
-		//}
-	//}
 	return route;
 }
 
@@ -133,15 +139,51 @@ void fordFulkersion::setRGraph(bulkOverlay G, int n)
 	for (int i = 0; i < MAXMATRIX; i++) {
 		for (int j = 0; j < MAXMATRIX; j++) {
 			rGraph[i][j] = 0;
+			sGraph[i][j] = 0;
 		}
 	}
+	//int graph[9][9] = { 
+		//{ 0, 140, 0, 0, 0, 0, 0, 0, 0}, 
+		//{ 0, 0, 20, 40, 30, 2000, 0, 0, 0},
+		//{ 0, 0, 0, 40, 30, 0, 2000, 0, 0},
+		//{ 0, 0, 31, 0, 1, 0, 0, 2000, 0},
+		//{ 0, 0, 0, 0, 0, 0, 0, 0, 2000},5
+		//{ 0, 0, 0, 0, 0, 0, 20, 40, 30 },
+		//{ 0, 0, 0, 0, 0, 0, 0, 40, 30 },
+		//{ 0, 0, 0, 0, 0, 0, 31, 0, 1 },
+		//{ 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+	//};
+
+	//for (int i = 0; i < 9; i++) {
+		//for (int j = 0; j < 9; j++) {
+			//rGraph[i][j] = graph[i][j];
+		//}
+	//}
+
 	for (int v = 0; v < n; v++) {
 		slist<bulkFlow> pFlow = G.getVirtualAdj(v);
 		slist<bulkFlow>::iterator iter = pFlow.begin();
 		for (; iter != pFlow.end(); iter++) {
 			int fromId = iter->getGraphEdgeSource();
 			int toId = iter->getGraphEdgeSink();
+			//cout<<"fromId:"<<fromId<<" toId:"<<toId<<endl;
+			//cout<<"capacity:"<<iter->getCapacity()<<endl;
 			rGraph[fromId][toId] = iter->getCapacity();
+			sGraph[fromId][toId] = iter->getCapacity();
+			//rGraph[fromId][toId] = iter->getPredictiveCapacity();
 		}
 	}
+}
+
+/**
+ * @brief getRdgeRateBySecond 
+ * 获得路径上的速率/秒
+ * @param {int} s
+ * @param {int} e
+ *
+ * @return {double}
+ */
+double fordFulkersion::getEdgeRateBySecond(int s, int e)
+{
+	return sGraph[s][e] / 60;
 }

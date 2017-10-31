@@ -1,4 +1,5 @@
 #include "bulkAgent.h"
+
 /**
  * @brief recv 
  * @return {boolean} 
@@ -30,13 +31,26 @@ bool bulkAgent::send()
 }
 
 /**
+ * @brief toString 
+ *
+ * @param {int} n
+ *
+ * @return {string}
+ */
+string bulkAgent::toString(int n)
+{
+	ostringstream stream;
+	stream<<n;
+	return stream.str();
+}
+
+/**
  * @brief recv 
  * 通过link接收数据, 从link缓存发送到Agent缓存
  * @param {bulkLink&} link
  */
 void bulkAgent::recvToAgent(bulkLink& link)
 {
-	int headId = link.getHeadId();
 	//consider the sink node
 	if (_node.getTerminal()) {
 		set<int>::iterator iter = _node.terminalIds_.begin();
@@ -44,6 +58,15 @@ void bulkAgent::recvToAgent(bulkLink& link)
 			slist<bulkPacket>*  packets = link.headbuf_.getPacketsStore(*iter);
 			while (!packets->empty()) {
 				bulkPacket& packet = packets->front();
+				//string sql = "insert into packet(session_id, start_time, end_time, hop_num, source_id, sink_id) values(";
+				//sql += toString(packet._sId) + "," + toString(packet._bTime) + "," + toString(simTime_) + "," + toString(packet._hopCount) + "," + toString(packet._sourceId) + "," + toString(_aId) + ");";
+				//db_.exeSQL(sql);
+				int sId = packet._sId;
+				string sql = "";
+				sql += toString(sId) + "," + toString(packet._bTime) + "," + toString(simTime_) + "," + toString(packet._hopCount) + "," + toString(packet._sourceId) + "," + toString(_aId);
+				log_packet[sId].push_back(sql);
+				packet._sId = packet._sourceId = packet._bTime = packet._nowId = -1;
+				packet._hopCount = 0;
 				pool.placePacketsToPool(&packet);
 				packets->pop_front();
 			} 
@@ -51,6 +74,7 @@ void bulkAgent::recvToAgent(bulkLink& link)
 			packets = NULL;
 		}
 	}
+	int headId = link.getHeadId();
 	for (int i = 1; i <= MAXSESSION; i++) {
 		slist<bulkPacket>*  packets = link.headbuf_.getPacketsStore(i);
 		while (!packets->empty()) {
@@ -112,13 +136,20 @@ slist<bulkPacket>* bulkAgent::getStore(int sId)
 			slist<bulkPacket>* pPacket = iter->getPacketsStore(sId);
 			while (!pPacket->empty()) {
 				bulkPacket& packet = pPacket->front();
+				if (packet._nowId != _aId) {
+					packet._hopCount++;
+					packet._nowId = _aId;
+				}
 				sum->push_front(packet);
 				pPacket->pop_front();
 			}
+			pPacket->~slist();
+			pPacket = NULL;
 		}
 		pBuf = &_recvbuf;
 		tag++;
 	}
+	//cout<<"sId:"<<sId<<" nodeId:"<<_aId<<" sum:"<<sum->size()<<endl;
 	return sum;
 }
 
@@ -167,6 +198,7 @@ int bulkAgent::reallocPackets(int sId)
 	bulkBuffer* pBuf;
 	int* bufSum;
 	int count;
+	//cout<<"sum:"<<sum<<endl;
 	//cout<<"nodeId:"<<_node.getNodeId()<<endl;
 	while (tag != DEFAULT) {
 		for (iter = pLink->begin(); iter != pLink->end(); iter++) {
@@ -190,6 +222,7 @@ int bulkAgent::reallocPackets(int sId)
 					qsv->pop_front();
 					count++;
 				}
+				//cout<<(*iter)->getGraphEdgeSource()<<"->"<<(*iter)->getGraphEdgeSink()<<" num:"<<count<<endl;
 				*bufSum = count;
 			}
 		}
@@ -210,6 +243,38 @@ int bulkAgent::reallocPackets(int sId)
 }
 
 /**
+ * @brief getCapacityFromFile 
+ *
+ * @param {bulkLink} link
+ *
+ * @return 
+ */
+double bulkAgent::getCapacityFromFile(bulkLink link)
+{
+	char buff[1024];
+	int from = link.getGraphEdgeSource(); 
+	int to = link.getGraphEdgeSink();
+	if (from == to) {
+		return link.getCapacity();
+	}
+	string file_path = string("../Bulk_Config_File/file/") + toString(from) + string("_") + toString(to) + string(".txt");
+	FILE* handle = fopen(file_path.c_str(), "r");
+	int i = 0;
+	int curTime = ceil(float(simTime_) / float(interval_));
+	double capacity = 0;
+	while (i < curTime && !feof(handle)) {
+		fgets(buff, 1024, handle);
+		string message(buff);
+		int len = message.find(" ");
+		int ftime = atoi(message.substr(0, len).c_str());
+		capacity = atoi(message.substr(len + 1).c_str());
+		i++;
+	}
+	fclose(handle);
+	return capacity;
+}
+
+/**
  * @brief reallocRequests 
  * 对每个发送链路中的session分配发送数据包数量
  * @param {bulkLink} link
@@ -220,7 +285,11 @@ float bulkAgent::reallocRequests(bulkLink& link)
 {
 	int sourceId = link.getGraphEdgeSource();
 	int sinkId = link.getGraphEdgeSink();
-	double nowCapacity = link.getCapacity() * 10;
+	//double nowCapacity = link.getCapacity();
+	double nowCapacity = getCapacityFromFile(link);
+	if (nowCapacity == 0) {
+		nowCapacity = link.getCapacity();
+	}
 	double fiNum = 0;
 	map<double, int> sorted;
 	//遍历session
@@ -241,6 +310,7 @@ float bulkAgent::reallocRequests(bulkLink& link)
 		if (sToDemand[sId] != 0 && iterS->first != 0) { 
 			double difference = link.diffPackets(sId);
 			double demand = sToDemand[sId];
+			//cout<<"differcence:"<<difference<<endl;
 			int fi = ROUND((difference - s * pow(demand, 2)) / 2);
 			if (fi <= 0) {
 				fi = 0;
@@ -250,8 +320,8 @@ float bulkAgent::reallocRequests(bulkLink& link)
 				fi--;
 				fiNum--;
 			}
-			cout<<"from:"<<sourceId<<" to:"<<sinkId<<" fi:"<<fi<<endl;
 		    fsum += fi * (difference - fi) / pow (demand, 2);
+			//cout<<"from:"<<sourceId<<" to:"<<sinkId<<" fi:"<<fi<<" capacity:"<<nowCapacity<<" fsum:"<<fsum<<" demand:"<<demand<<" difference:"<<difference<<endl;
 			_requestBuf[tailId][sId] = fi;
 		}
 	}
@@ -386,6 +456,7 @@ void bulkAgent::addVirtualOutputLink(bulkLink* link)
 {
 	if (fake_) {
 		_node.addOutputLink(link);
+		setSendBuf(1);
 	}
 }
 
@@ -397,6 +468,15 @@ void bulkAgent::addVirtualOutputLink(bulkLink* link)
  */
 void bulkAgent::inputVirtualNode(bulkPacket& packet, int sId) 
 {
-	setSendBuf(1);
 	_sendbuf[0].pushPacketsToBuf(sId, packet);
+}
+
+/**
+ * @brief handle 
+ */
+void bulkAgent::handle()
+{
+	recv();
+	//cout<<"aId:"<<getAId()<<" num:"<<reallocAll()<<endl;
+	send();
 }

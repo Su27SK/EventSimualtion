@@ -12,6 +12,7 @@ include_directories(../common)
 include_directories(../topology)
 include_directories(../lib)
 include_directories(../exception)
+include_directories(../db)
 
 # 查找当前目录下面的所有源文件
 # 并将名称保存到 DIR_SRCS 变量
@@ -22,7 +23,9 @@ add_library(apps ${DIR_LIB_SRCS})
 
 set (CMAKE_CXX_FLAGS "-g")
 set (CMAKE_CXX_FLAGS "-Wall")
-set (CMAKE_CXX_FLAGS "-I/usr/local/include")
+set (CMAKE_CXX_FLAGS "-mcmodel=large")
+set (CMAKE_CXX_FLAGS "-I /usr/local/include")
+set (CMAKE_CXX_FLAGS  "-lmysqlclient")
 #set (CMAKE_CXX_FLAGS "-L/usr/local/lib")
 
 if (APPLE) 

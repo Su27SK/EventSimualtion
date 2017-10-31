@@ -298,7 +298,7 @@ size_t Graph::_filterInfo(char* message, Graph* graph)
 				latter = s.substr(5 + index + sourceLen + sinkLen);
 				int wLen = latter.find(" ");
 				weight = atoi(latter.substr(0, wLen).c_str());
-				capacity = 0;
+				capacity = atoi(latter.substr(wLen + 1).c_str());
 				graph->putEdge(source, sink, weight, capacity);
 				return -1;
 			}

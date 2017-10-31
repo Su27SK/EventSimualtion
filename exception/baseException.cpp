@@ -7,7 +7,8 @@
 
 #include "baseException.h"
 
-baseException::baseException(const string& msg) throw() : mMsg_(msg), mFile_("<unknow file>"), mFunc_("<unknow func>"), mLine_(-1), _mStackTraceSize(0) {}
+baseException::baseException(const string& msg) throw() : mMsg_(msg), mFile_("<unknow file>"), mFunc_("<unknow func>"), mLine_(-1), _mStackTraceSize(0) 
+{}
 
 baseException::~baseException() throw()
 {}
@@ -76,6 +77,7 @@ const string& baseException::ToString() const
 		sstr<<"\nStack Trace:\n";
 		sstr<<getStackTrace();
 		_mWhat = sstr.str();
+		return _mWhat;
 	}
 }
 

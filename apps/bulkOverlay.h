@@ -10,6 +10,7 @@ class bulkOverlay:public flowNetwork
 		vector<slist<bulkFlow> > _vAdj;
 		vector<bulkOverlayAgent*> _agents;
 		void _init();
+		double _route[MAXROUTE][MAXROUTE];
 	public:
 		bulkOverlay():flowNetwork() {
 			_init();
@@ -18,15 +19,19 @@ class bulkOverlay:public flowNetwork
 		bulkOverlay(Graph* graph): flowNetwork(graph) {
 			_init();
 		}
-		void initVirtual(int time);
-		int initVirtualSource(int F, int v);
+		void initVirtualNode(int baseTime, int time);
+		int initVirtualSource(int F, int v, int u);
+		void setAllStorage(int v, int u);
 		void addEdge(bulkFlow e);
-		void transmission(int time);
-		double scheduling(int v, int u, int F);
-		bool updating(int interval, string path);
-		double initNetBottlenecksWithT(int v, int u, int F);
+		void transmission(int baseTime, int v, int u, int time);
+		bool pushTrafficByMinute(vector<bulkFlow> flows);
+		double scheduling(int baseTime, int v, int u, int F);
+		bool updating(int interval, string path, int flag);
+		double initNetBottlenecksWithT(int baseTime, int v, int u, int F);
+		int getAllStorage(int v, int u) const;
 		int getVirtualVertices();
 		slist<bulkFlow> getVirtualAdj(int v);
+		void setLog(int time);
 		void clearVirtualAdj();
 };
 #endif

@@ -8,7 +8,7 @@
  */
 void bulkOverlay::_init()
 {
-	size_t tSize = _adj.size();
+	size_t tSize = _adj[0].size();
 	for (size_t i = 0; i < tSize; i++) {
 		bulkOverlayAgent* pOverlayAgent = new bulkOverlayAgent(i);
 		pOverlayAgent->setResidualStorage(INT_MAX);
@@ -17,13 +17,13 @@ void bulkOverlay::_init()
 }
 
 /**
- * @brief _initVirtual 
+ * @brief _initVirtualNode 
  * 初始化为virtualNode
- * @param {interge} time (单位: /s)
+ * @param {interge} time (单位: /minute)
  */
-void bulkOverlay::initVirtual(int time)
+void bulkOverlay::initVirtualNode(int baseTime, int time)
 {
-	size_t tSize = _adj.size();
+	size_t tSize = _adj[0].size();
 	if (time <= 0 || tSize == 0) {
 		return ;
 	}
@@ -31,13 +31,17 @@ void bulkOverlay::initVirtual(int time)
 	size_t n = time * (tSize - 1);
 	int i = 1, j = 0;
 	_vAdj.resize(n + 1);
-	while (j < time) {
+	while (j < time - 1) {
 		while (i < tSize) {
-			slist<bulkFlow*>::iterator iter = _adj[i]->begin();
-			for (; iter != _adj[i]->end(); iter++) {
+			int index = baseTime + j + 1;
+			//int index = j + 1;
+			slist<bulkFlow*>::iterator iter = _adj[index][i]->begin();
+			for (; iter != _adj[index][i]->end(); iter++) {
 				bulkFlow e = **iter;
 				int sourceId = e.getGraphEdgeSource() + j * (tSize - 1);
-				int sinkId = e.getGraphEdgeSink() + j * (tSize - 1);
+				int sinkId = e.getGraphEdgeSink() + (j + 1) * (tSize - 1);
+				//cout<<"time:"<<j + 1<<" source:"<<sourceId<<" sink:"<<sinkId<<" capacity:"<<e.getCapacity()<<endl;
+				cout<<"sourceId:"<<sourceId<<" sinkId:"<<sinkId<<endl;
 				e.setSourceId(sourceId).setSinkId(sinkId);
 				addEdge(e);
 			}
@@ -46,76 +50,142 @@ void bulkOverlay::initVirtual(int time)
 		j++;
 		i = 1;
 	}
-	for (size_t i  = 1; i <= n - tSize + 1; i++) {
-		int nextId = i + (tSize - 1);
-		int index = nextId % (tSize - 1);
-		index = index != 0 ? index: index + 27;
-		double residualStorage = _agents[index]->getResidualStorage();
-		GraphEdge edge(i, nextId, residualStorage, residualStorage);
-		bulkFlow virtualLink(0.0, edge);
-		addEdge(virtualLink);
-	}
+	//for (size_t i  = 1; i <= n - tSize + 1; i++) {
+		//int nextId = i + (tSize - 1);
+		//int index = nextId % (tSize - 1);
+		//index = index != 0 ? index: index + 27;
+		//double residualStorage = _agents[index]->getResidualStorage();
+		//GraphEdge edge(i, nextId, residualStorage, residualStorage);
+		//bulkFlow virtualLink(0.0, edge);
+		//addEdge(virtualLink);
+	//}
 }
 
 /**
  * @brief transmission 
  *
- * @param {interge} time (单位: /s)
+ * @param {interge} time (单位: /minute)
  */
-void bulkOverlay::transmission(int time)
+void bulkOverlay::transmission(int baseTime, int v, int u, int time)
 {
 	if (time <= 0) {
 		return ;
 	}
-	int tSize = _adj.size();
-	for (size_t i = 0; i < fordFulkersion::_flow.size() ; i++) {
+	int tSize = _adj[0].size();
+	vector<vector<bulkFlow> > vec;
+	vec.resize(time);
+	double recv[30] = {0};
+	int count = 1;
+	int preTime = 0;
+	FILE* handle = fopen("transfer.txt", "w+");
+	for (size_t i = 1; i < fordFulkersion::_flow.size(); i++) {
 		for (size_t j = 0; j < fordFulkersion::_flow[i].size(); j++) {
 			double flow = fordFulkersion::_flow[i][j];
-			if ((i / tSize) <= (time - 1) && (j / tSize) <= (time - 1) && flow > 0) {
+			if (flow > 0) {
 				int fromId = i; 
 				int toId = j;
-				//cout<<"fromId:"<<fromId<<endl;
-				//cout<<"toId:"<<toId<<endl;
-				fromId = fromId >= tSize ? fromId % (tSize - 1) : fromId;
-				toId = toId >= tSize ? toId % (tSize - 1) : toId;
-				if (toId == 0) {
-					toId = toId + (tSize - 1);
+				if (fromId % (tSize - 1) == 0) {
+					preTime = fromId / (tSize - 1);
+				} else {
+					preTime = fromId / (tSize - 1) + 1;
 				}
-				//double limitLink = _agents[fromId]->get
-				_agents[fromId]->setUplink(flow).send();
-				_agents[toId]->setDownlink(flow).recv();
+				if (fromId > count * (tSize - 1)) {
+					for (int k = 1; k < tSize; k++) {
+						_agents[k]->recv(recv[k]);
+					}
+					setLog(count);
+					count++;
+					memset(recv, 0, sizeof(recv));
+				}
+				int indexFrom = fromId % (tSize - 1);
+				int indexTo = toId % (tSize - 1);
+				fromId = indexFrom != 0 ? indexFrom : 27;  
+				toId = indexTo != 0 ? indexTo : 27;
+				double trueFlow = _agents[fromId]->send(flow);
+				fprintf(handle, "time:%d, fromId:%d, toId:%d, flow:%f, trueFlow:%f\n", preTime, fromId, toId, flow, trueFlow);
+				//cout<<"time:"<< preTime << " fromId:"<<fromId<<" toId:"<<toId<<" flow:"<<flow<<" trueFlow:"<<trueFlow<<endl;
+				recv[toId] += trueFlow;
 			}
 		}
 	}
-	for (int i = 0; i < 27; i++) {
-		cout<<"storage:"<<_agents[i]->getStorage()<<endl;
+	for (int k = 1; k < tSize; k++) {
+		_agents[k]->recv(recv[k]);
 	}
+	setLog(count);
+	//for (size_t i = 0; i < vec.size(); i++) {
+		//pushTrafficByMinute(vec[i]);
+	//}
+	double total = getAllStorage(v, u);
+	fclose(handle);
+	cout<<"total:"<<total<<endl;
+}
+
+/**
+ * @brief pushTrafficByMinute 
+ * 每分钟推送traffic
+ * @param {vector<bulkFlow>} flows
+ *
+ * @return {boolean}
+ */
+bool bulkOverlay::pushTrafficByMinute(vector<bulkFlow> flows)
+{
+	for (int i = 1; i <= 60; i++) {
+		int recv[30] = {0};
+		vector<bulkFlow>::iterator iter = flows.begin();
+		for (; iter != flows.end(); iter++) {
+			int fromId = iter->getGraphEdgeSource();
+			int toId = iter->getGraphEdgeSink();
+			double require = 0.0;
+			int trueFlow = _agents[fromId]->send(iter->getFlow() / 60);
+			//cout<<"fromId:"<<fromId<<" toId:"<<toId<<" trueFlow:"<<trueFlow<<endl;
+			recv[toId] += trueFlow;
+		}
+		for (int j = 1; j <= 27; j++) {
+			_agents[j]->recv(recv[j]);
+		}
+	}
+	return true;
 }
 
 /**
  * @brief initVirtualSource 
  *
  * @param {interge} F
- * @param {intergParentv
+ * @param {interge} v
+ * @param {interge} u
  *
- * @return {interge} 虚拟超级节点索引值
+ * @return {interge} 需要发送的总数据
  */
-int bulkOverlay::initVirtualSource(int F, int v)
+int bulkOverlay::initVirtualSource(int F, int v, int u)
 {
-	size_t tSize = _adj.size();
+	size_t tSize = _adj[0].size();
 	for (int k = 1; k < tSize; k++) {
-		double storage = _agents[k]->getStorage();
-		if (k != v && storage != 0) { //S链接w(1)
-			GraphEdge edge(0, k, storage, storage);
-			bulkFlow vLinkFromS(0.0, edge);
-			addEdge(vLinkFromS);
-		} else if (k == v) { //S链接v
-			GraphEdge edge(0, k, F, F);
-			bulkFlow vLinkFromS(0.0, edge);
-			addEdge(vLinkFromS);
+		if (k != u) {
+			double storage = _agents[k]->getStorage();
+			if (storage != 0) { //S链接w(1), v(1)
+				GraphEdge edge(0, k, storage, storage);
+				bulkFlow vLinkFromS(0.0, edge);
+				addEdge(vLinkFromS);
+			}
 		}
 	}
 	return 0;
+}
+
+/**
+ * @brief setLog 
+ *
+ * @param {interge} time
+ */
+void bulkOverlay::setLog(int time)
+{
+	size_t tSize = _adj[0].size();
+	FILE* handle = fopen("StorageInfo.txt", "a+");  
+	for (int id = 0; id < tSize; id++) {
+		int storage = _agents[id]->getStorage();
+		fprintf(handle, "time:%d, NodeId:%d, StoreNum:%d\n", time, id, storage);
+	}
+	fclose(handle);
 }
 
 /**
@@ -147,45 +217,74 @@ void bulkOverlay::addEdge(bulkFlow e)
  * @param {interge} v
  * @param {interge} u
  * @param {interge} F
+ *
  * @return {double}
  */
-double bulkOverlay::scheduling(int v, int u, int F)
+double bulkOverlay::scheduling(int baseTime, int v, int u, int F)
 {
-	return initNetBottlenecksWithT(v, u, F);
+	_agents[v]->setStorage(F + _agents[v]->getStorage());
+	return initNetBottlenecksWithT(baseTime, v, u, F);
+}
+
+/**
+ * @brief setAllStorage 
+ *
+ * @param {interge} v
+ * @param {interge} u
+ *
+ * @return 
+ */
+void bulkOverlay::setAllStorage(int v, int u)
+{
+	for (int i = 1; i <= 27; i++) {
+		if (i != v && i != u) {
+			_agents[i]->setStorage(100000);
+		}
+	}
 }
 
 /**
  * @brief updating 
  * 获得预测信息之后，更新每条边数据
  * @param {interge} interval
- * @param {string} path
+ * @param {string}  path
+ * @param {interge} flag  {0: forecase; 1: true limit}
+ *
  * @return {boolean}
  */
-bool bulkOverlay::updating(int interval, string path)
+bool bulkOverlay::updating(int interval, string path, int flag)
 {
 	slist<bulkFlow*>::iterator iter;
-	FILE* handle;
-	//string dir = "../Bulk_Config_File/link/";
+	FILE* handle = NULL;
 	string dir = path;
-	for (size_t i = 1; i < _adj.size(); i++) {
-		for (iter = _adj[i]->begin(); iter != _adj[i]->end(); iter++) {
-			int sourceId = (*iter)->getGraphEdgeSource();
-			int sinkId = (*iter)->getGraphEdgeSink();
-			stringstream fromId, toId;
-			fromId << sourceId;
-			toId << sinkId;
-			string filename = string(fromId.str()) + string("_To_")+string(toId.str()) + string("_link.txt");
-			string fullPath = dir + filename;
-			handle = fopen(fullPath.c_str(), "r");
-			char buf[10];
-			int count = 1;
-			while (!feof(handle) && count <= interval) {
-				fgets(buf, 1024, handle);
-				count++;
+	try {
+		for (size_t i = 1; i < _adj[interval].size(); i++) {
+			for (iter = _adj[interval][i]->begin(); iter != _adj[interval][i]->end(); iter++) {
+				int sourceId = (*iter)->getGraphEdgeSource();
+				int sinkId = (*iter)->getGraphEdgeSink();
+				stringstream fromId, toId;
+				fromId << sourceId;
+				toId << sinkId;
+				string filename = string(fromId.str()) + string("_To_") + string(toId.str()) + string("_link.txt");
+				string fullPath = dir + filename;
+				handle = fopen(fullPath.c_str(), "r");
+				char buf[10];
+				int count = 1;
+				while (!feof(handle) && count <= interval) {
+					fgets(buf, 1024, handle);
+					count++;
+				}
+				double capacity = atoi(buf);
+				if (flag) {
+					(*iter)->setCapacity(capacity);
+				} else {
+					(*iter)->setPredictiveCapacity(capacity);
+				}
+				fclose(handle);
 			}
-			double capacity = atoi(buf);
-			(*iter)->setCapacity(capacity);
 		}
+	} catch(exception e) {
+		cout<<"updating error"<<endl;
 	}
 	return true;
 }
@@ -196,46 +295,37 @@ bool bulkOverlay::updating(int interval, string path)
  * @param {interge} v
  * @param {interge} u
  * @param {interge} F 
+ *
  * @return {double} min(Max(T))
  */
-double bulkOverlay::initNetBottlenecksWithT(int v, int u, int F)
+double bulkOverlay::initNetBottlenecksWithT(int baseTime, int v, int u, int F)
 {
 	//二分查找法寻找寻找min(T_max) for the volume F
-	int lowIndex = 1, highIndex = 59, mid = 0;
-	double value = 0.0;
-	int count = INT_MAX;
-	while (lowIndex <= highIndex) {
-		mid = lowIndex + ((highIndex - lowIndex) / 2);
-		cout<<"mid:"<<mid<<endl;
-		initVirtual(mid);
-		int s = initVirtualSource(F, v);
-		int t = u + (mid - 1) * (_adj.size() - 1);
-		fordFulkersion::FordFulkersion(*this, s, t, getVirtualVertices());
-		value = fordFulkersion::getValue();
-		if (value  >= F) {
-			highIndex = mid - 1;
-			if (mid < count) {
-				count = mid;
-			}
-		} else if (value < F) {
-			lowIndex = mid + 1;
+	F = 0;
+	for (size_t i = 0; i < _agents.size(); i++) {
+		if (i != u) {
+			F += _agents[i]->getStorage(); 
 		}
 	}
-	if (mid < count && F == value) {
-		count = mid;
+	cout<<"F:"<<F<<endl;
+	double value = 0.0;
+	int ans = 3;
+	if (ans <= 720) {
+		cout<<"ans:"<<ans<<endl;
 	}
-	initVirtual(count);
-	int s = initVirtualSource(F, v);
-	int t = u + (count - 1) * (_adj.size() - 1);
-	fordFulkersion::FordFulkersion(*this, s, t, getVirtualVertices());
-	
-	cout<<"count:"<<count<<endl;
-	return count;
+	initVirtualNode(baseTime, ans);
+	//initVirtualSource(F, v, u);
+	//int t = u + (ans - 1) * (_adj[0].size() - 1);
+	////cout<<"t:"<<t<<endl;
+	//fordFulkersion::FordFulkersion(*this, 0, t, getVirtualVertices());
+	//cout<<"value:"<<fordFulkersion::getValue()<<endl;
+	return ans;
 }
 
 /**
  * @brief getVirtualVertices 
  * (include the S* virtual Node)
+ *
  * @return {interge}
  */
 int bulkOverlay::getVirtualVertices()
@@ -254,3 +344,26 @@ slist<bulkFlow> bulkOverlay::getVirtualAdj(int v)
 {
 	return _vAdj[v];
 }
+
+
+/**
+ * @brief getAllStorage 
+ *
+ * @param {interge} v
+ * @param {interge} u
+ *
+ * @return 
+ */
+int bulkOverlay::getAllStorage(int v, int u) const
+{
+	vector<bulkOverlayAgent*>::const_iterator iter = _agents.begin();
+	int index = 0;
+	int total = 0;
+	for (; iter != _agents.end(); iter++) {
+		//cout<<"index:"<<index<<" storage:"<<(*iter)->getStorage()<<endl;
+		total += (*iter)->getStorage();
+		index++;
+	}
+	return total;
+}
+

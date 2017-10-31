@@ -3,6 +3,8 @@
 #include "bulkAgent.h"
 #include "bulkNetwork.h"
 #include <string.h>
+#include <omp.h>
+#include <pthread.h>
 #define THRESHOLD 0.1 //ε
 class bulkBackPressure:public bulkNetwork
 {
@@ -23,7 +25,10 @@ class bulkBackPressure:public bulkNetwork
 		}
 		void initVirtualAgents();
 		void initAgents();
+		void init();
+		bulkBackPressure& setIntervalVary(int n);
 		bulkBackPressure& setSession(int sId, int sourceId, int sinkId, double demand);
 		virtual void handle();
+		void writeLog();
 };
 #endif

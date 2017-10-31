@@ -5,6 +5,7 @@
 #include <ext/slist>
 #include <vector>
 #include <map>
+#include <sstream>
 #include "agent.h"
 #include "bulkNode.h"
 #include "bulkBuffer.h"
@@ -33,6 +34,7 @@ class bulkAgent:public Agent
 			setRecvBuf(_node.getInputNum() + 1);
 			fake_ = false;
 		}
+		string toString(int n);
 		virtual bool recv();
 		virtual bool send();
 		void setSendBuf(int num);
@@ -45,8 +47,10 @@ class bulkAgent:public Agent
 		double getAllWeight();
 		int reallocPackets(int sId);
 		float reallocRequests(bulkLink& link);
+		double getCapacityFromFile(bulkLink link);
 		int getAId() const;
 		int reallocAll();
 		void reallocAllRequests();
+		void handle();
 };
 #endif

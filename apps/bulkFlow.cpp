@@ -89,3 +89,26 @@ bulkFlow& bulkFlow::setSinkId(int id)
 	_v2 = id;
 	return *this;
 }
+
+/**
+ * @brief setPredictiveCapacity 
+ *
+ * @param {double} capacity
+ *
+ * @return 
+ */
+bulkFlow& bulkFlow::setPredictiveCapacity(double capacity)
+{
+	_predictiveCapacity = capacity;
+	return *this;
+}
+
+/**
+ * @brief getPredictiveCapacity 
+ *
+ * @return {double}
+ */
+double bulkFlow::getPredictiveCapacity()
+{
+	return _predictiveCapacity;
+}

@@ -11,7 +11,7 @@ class flowNetwork
 	private:
 		void _initAdj();
 	protected:
-		vector<slist<bulkFlow*>* > _adj;
+		vector<vector<slist<bulkFlow*>* > > _adj;
 		Graph* _topology;
 	public:
 		flowNetwork() {
@@ -20,8 +20,8 @@ class flowNetwork
 		flowNetwork(Graph* graph): _topology(graph) {
 			_initAdj();
 		}
-		slist<bulkFlow*>* getAdj(int v);
-		void addEdge(bulkFlow* e);
+		slist<bulkFlow*>* getAdj(int time, int v);
+		void addEdge(int time, bulkFlow* e);
 		virtual int getVertices();
 };
 #endif
